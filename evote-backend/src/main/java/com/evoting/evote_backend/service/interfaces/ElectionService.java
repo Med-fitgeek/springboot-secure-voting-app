@@ -5,6 +5,7 @@ import com.evoting.evote_backend.dto.ElectionResponseDTO;
 import com.evoting.evote_backend.dto.ElectionResultDTO;
 import com.evoting.evote_backend.dto.VoterTokenResponseDTO;
 import com.evoting.evote_backend.entity.Election;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 

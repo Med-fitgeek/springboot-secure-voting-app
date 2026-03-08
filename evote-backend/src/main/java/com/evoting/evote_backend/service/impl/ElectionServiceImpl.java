@@ -2,12 +2,17 @@ package com.evoting.evote_backend.service.impl;
 
 import com.evoting.evote_backend.dto.*;
 import com.evoting.evote_backend.entity.*;
+import com.evoting.evote_backend.exception.BusinessException;
 import com.evoting.evote_backend.mapper.ElectionMapper;
 import com.evoting.evote_backend.repository.*;
 import com.evoting.evote_backend.service.interfaces.ElectionService;
+import com.evoting.evote_backend.service.interfaces.EmailService;
+import com.evoting.evote_backend.service.interfaces.VoterTokenService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -21,88 +26,64 @@ public class ElectionServiceImpl implements ElectionService {
     private final VoterTokenRepository voterTokenRepository;
     private final OptionRepository optionRepository;
     private final ElectionMapper electionMapper;
+    private final VoterTokenService voterTokenService;
+    private final EmailService emailService;
 
 
     @Transactional
     @Override
-    public List<VoterTokenResponseDTO> createElection(ElectionRequestDTO dto, String username) {
+    public List<VoterTokenResponseDTO> createElection(
+            ElectionRequestDTO dto,
+            String username
+    ) {
+
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
-        if(dto.getStartDate().isAfter(dto.getEndDate())
-                || dto.getStartDate().isBefore(LocalDateTime.now() )
-                || dto.getEndDate().isBefore(LocalDateTime.now()))
-            throw new IllegalArgumentException("La date des elections est invalide.");
+        validateElectionDates(dto);
 
-        // 1. Créer l’élection
-        Election election = Election.builder()
-                .title(dto.getTitle())
-                .description(dto.getDescription())
-                .startDate(dto.getStartDate())
-                .endDate(dto.getEndDate())
-                .createdBy(creator)
-                .build();
+        Election election = electionMapper.toEntity(dto);
+        election.setCreatedBy(creator);
 
-        // 2. Créer les options
-        List<Option> options = new ArrayList<>();
-        for (String label : dto.getOptions()) {
-            Option option = Option.builder()
-                    .label(label)
-                    .election(election)
-                    .build();
-            options.add(option);
-        }
-        election.setOptions(options);
-
-        // 3. Générer les tokens de vote
-        List<VoterToken> voterTokens = new ArrayList<>();
-        List<VoterTokenResponseDTO> responseTokens = new ArrayList<>();
-
-        for (String voterName : dto.getVoters()) {
-            UUID token = UUID.randomUUID();
-            VoterToken voterToken = VoterToken.builder()
-                    .token(token)
-                    .used(false)
-                    .election(election)
-                    .build();
-            voterTokens.add(voterToken);
-
-            responseTokens.add(new VoterTokenResponseDTO(voterName, token));
-        }
-        election.setVoterTokens(voterTokens);
-
-        // 4. Sauvegarder l’élection, les options, et les tokens
         electionRepository.save(election);
 
-        return responseTokens;
+        List<VoterToken> tokens = voterTokenService.generateTokens(
+                election,
+                dto.voters()
+        );
+
+        emailService.sendVotingLinks(tokens);
+
+        return tokens.stream()
+                .map(t -> new VoterTokenResponseDTO(
+                        t.getEmail(),
+                        t.getToken()
+                ))
+                .toList();
     }
 
     @Override
     @Transactional
     public String updateElection(Long id, ElectionRequestDTO dto, String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
 
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Élection introuvable"));
 
-        // Vérifie que l’utilisateur est bien le créateur
         if (!election.getCreatedBy().getId().equals(creator.getId()))
-            throw new SecurityException("Vous n’êtes pas autorisé à modifier cette élection.");
+            throw new BusinessException("Vous n’êtes pas autorisé à modifier cette élection.");
 
-        // Vérifie que l’élection n’a pas encore commencé
         if (election.getStartDate().isBefore(LocalDateTime.now()))
-            throw new IllegalArgumentException("Impossible de modifier une élection déjà commencée.");
+            throw new BusinessException("Impossible de modifier une élection déjà commencée.");
 
-        // Met à jour les infos principales
-        election.setTitle(dto.getTitle());
-        election.setDescription(dto.getDescription());
-        election.setStartDate(dto.getStartDate());
-        election.setEndDate(dto.getEndDate());
+        election.setTitle(dto.title());
+        election.setDescription(dto.description());
+        election.setStartDate(dto.startDate());
+        election.setEndDate(dto.endDate());
 
-        // Mise à jour des options
         List<Option> newOptions = new ArrayList<>();
-        for (String label : dto.getOptions()) {
+        for (String label : dto.options()) {
             Option option = Option.builder()
                     .label(label)
                     .election(election)
@@ -111,9 +92,8 @@ public class ElectionServiceImpl implements ElectionService {
         }
         election.setOptions(newOptions);
 
-        // Mise à jour des votants (nouvelles personnes)
         List<VoterToken> newVoters = new ArrayList<>();
-        for (String name : dto.getVoters()) {
+        for (VoterDTO name : dto.voters()) {
             VoterToken token = VoterToken.builder()
                     .token(UUID.randomUUID())
                     .used(false)
@@ -131,32 +111,29 @@ public class ElectionServiceImpl implements ElectionService {
     @Transactional
     public void deleteElection(Long id, String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
 
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Élection introuvable"));
 
-        // Vérifie que l'utilisateur est bien le créateur
         if (!election.getCreatedBy().getId().equals(creator.getId())) {
-            throw new SecurityException("Vous n'êtes pas autorisé à supprimer cette élection.");
+            throw new BusinessException("Vous n'êtes pas autorisé à supprimer cette élection.");
         }
 
-        // Vérifie que l’élection n’a pas encore commencé
         if (election.getStartDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalArgumentException("Impossible de supprimer une élection déjà commencée.");
+            throw new BusinessException("Impossible de supprimer une élection déjà commencée.");
         }
 
-        // Supprime l’élection (avec cascade pour options et tokens)
         electionRepository.delete(election);
     }
 
     @Override
     public ElectionResponseDTO getElectionById(Long id, String username) {
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Élection introuvable"));
 
         if (!election.getCreatedBy().getUsername().equals(username)) {
-            throw new SecurityException("Accès interdit à cette élection.");
+            throw new BusinessException("Accès interdit à cette élection.");
         }
 
         return electionMapper.toDto(election);
@@ -165,7 +142,7 @@ public class ElectionServiceImpl implements ElectionService {
     @Override
     public List<ElectionResponseDTO> getElectionsByCreator(String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
 
         List<Election> elections = electionRepository.findByCreatedBy(creator);
         return electionMapper.toDtoList(elections);
@@ -174,7 +151,7 @@ public class ElectionServiceImpl implements ElectionService {
     @Override
     public List<ElectionResultDTO> getElectionResults(Long electionId) {
         Election election = electionRepository.findById(electionId)
-                .orElseThrow(() -> new RuntimeException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Élection introuvable"));
 
         List<Option> options = optionRepository.findByElection(election);
 
@@ -185,6 +162,16 @@ public class ElectionServiceImpl implements ElectionService {
                         voterTokenRepository.countBySelectedOption(option)
                 ))
                 .toList();
+    }
+
+
+    private void validateElectionDates(ElectionRequestDTO dto) {
+
+        if (dto.startDate().isAfter(dto.endDate()))
+            throw new IllegalArgumentException("Start date must be before end date");
+
+        if (dto.startDate().isBefore(LocalDateTime.now()))
+            throw new IllegalArgumentException("Start date must be in the future");
     }
 
 }
