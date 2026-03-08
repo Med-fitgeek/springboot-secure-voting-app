@@ -1,9 +1,11 @@
 package com.evoting.evote_backend.service.impl;
 
 import com.evoting.evote_backend.dto.VoteRequestDTO;
+import com.evoting.evote_backend.dto.VoterDTO;
 import com.evoting.evote_backend.entity.Election;
 import com.evoting.evote_backend.entity.Option;
 import com.evoting.evote_backend.entity.VoterToken;
+import com.evoting.evote_backend.exception.BusinessException;
 import com.evoting.evote_backend.repository.OptionRepository;
 import com.evoting.evote_backend.repository.VoterTokenRepository;
 import com.evoting.evote_backend.service.interfaces.VoterTokenService;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -21,34 +24,61 @@ public class VoterTokenServiceImpl implements VoterTokenService {
     private final VoterTokenRepository voterTokenRepository;
     private final OptionRepository optionRepository;
 
-    @Override
     @Transactional
+    @Override
     public void vote(VoteRequestDTO request) {
-        VoterToken voterToken = voterTokenRepository.findByToken(request.token())
-                .orElseThrow(() -> new IllegalArgumentException("Token invalide ou inexistant."));
+
+        VoterToken voterToken = voterTokenRepository
+                .findByToken(request.token())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (voterToken.isUsed()) {
-            throw new IllegalStateException("Ce lien de vote a déjà été utilisé.");
+            throw new IllegalStateException("Token already used");
         }
 
-        LocalDateTime now = LocalDateTime.now();
         Election election = voterToken.getElection();
+        LocalDateTime now = LocalDateTime.now();
 
-        if (now.isBefore(election.getStartDate()) || now.isAfter(election.getEndDate())) {
-            throw new IllegalStateException("La période de vote n'est pas active.");
+        if (now.isBefore(election.getStartDate())
+                || now.isAfter(election.getEndDate())) {
+
+            throw new IllegalStateException("Voting period not active");
         }
 
-        Option option = optionRepository.findById(request.optionId())
-                .orElseThrow(() -> new IllegalArgumentException("Option invalide."));
+        Option option = optionRepository
+                .findById(request.optionId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid option"));
 
-        // Vérifier que l'option appartient à la même élection
-        if (!option.getElection().getId().equals(voterToken.getElection().getId())) {
-            throw new IllegalArgumentException("Cette option ne correspond pas à cette élection.");
+        if (!option.getElection().getId().equals(election.getId())) {
+            throw new IllegalArgumentException("Option not in this election");
         }
 
         voterToken.setSelectedOption(option);
         voterToken.setUsed(true);
+        voterToken.setVotedAt(LocalDateTime.now());
+
         voterTokenRepository.save(voterToken);
+    }
+
+    @Transactional
+    @Override
+    public List<VoterToken> generateTokens(
+            Election election,
+            List<VoterDTO> voters
+    ) {
+
+        List<VoterToken> tokens = voters.stream()
+                .map(voter -> VoterToken.builder()
+                        .email(voter.email())
+                        .name(voter.name())
+                        .token(UUID.randomUUID())
+                        .used(false)
+                        .election(election)
+                        .build()
+                )
+                .toList();
+
+        return voterTokenRepository.saveAll(tokens);
     }
 }
 

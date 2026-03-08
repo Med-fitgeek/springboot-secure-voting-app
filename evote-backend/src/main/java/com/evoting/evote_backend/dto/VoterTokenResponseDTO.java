@@ -6,10 +6,5 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class VoterTokenResponseDTO {
-    private String voter;                 // Nom ou email du votant
-    private UUID token;
-}
+public record VoterTokenResponseDTO(String voter, UUID token){ }
+
