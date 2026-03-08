@@ -14,6 +14,11 @@ import java.util.List;
 public interface ElectionMapper {
     ElectionResponseDTO toDto(Election election);
     List<ElectionResponseDTO> toDtoList(List<Election> elections);
-    OptionDTO toDto(Option option);
     Election toEntity(ElectionRequestDTO electionRequestDTO);
+
+    default Option map(String label) {
+        return Option.builder()
+                .label(label)
+                .build();
+    }
 }
