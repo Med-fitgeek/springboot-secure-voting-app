@@ -1,17 +1,21 @@
 package com.evoting.evote_backend.dto;
-import lombok.Data;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
-@Data
-public class ElectionRequestDTO {
-    private String title;
-    private String description;
-    private List<String> options;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private List<String> voters;
-}
+public record ElectionRequestDTO(
+        @NotBlank
+        String title,
+        @NotBlank
+        String description,
+        @NotEmpty
+        List<String> options,
+        @NotEmpty
+        LocalDateTime startDate,
+        @NotEmpty
+        LocalDateTime endDate,
+        @NotEmpty
+        List<VoterDTO> voters) { }
 

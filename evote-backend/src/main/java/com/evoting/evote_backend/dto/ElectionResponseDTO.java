@@ -7,11 +7,10 @@ import java.util.Date;
 import java.util.List;
 
 @Builder
-public class ElectionResponseDTO {
-    private Long id;
-    private String title;
-    private String description;
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
-    private List<OptionDTO> options;
-}
+public record ElectionResponseDTO(
+        Long id,
+        String title,
+        String description,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+        List<OptionDTO> options) {}
