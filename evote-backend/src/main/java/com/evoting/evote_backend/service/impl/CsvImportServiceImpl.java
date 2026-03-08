@@ -1,8 +1,12 @@
 package com.evoting.evote_backend.service.impl;
 
 import com.evoting.evote_backend.dto.VoterDTO;
+import com.evoting.evote_backend.entity.User;
+import com.evoting.evote_backend.exception.BusinessException;
+import com.evoting.evote_backend.repository.UserRepository;
 import com.evoting.evote_backend.service.interfaces.CsvImportService;
 import com.opencsv.CSVReader;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,11 +18,15 @@ import java.util.List;
 import java.util.Set;
 
 @Service
+@RequiredArgsConstructor
 public class CsvImportServiceImpl implements CsvImportService {
 
+    private final UserRepository userRepository;
     @Override
-    public List<VoterDTO> parseVotersCsv(MultipartFile file) {
+    public List<VoterDTO> parseVotersCsv(MultipartFile file, String username) {
 
+        User creator = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
         List<VoterDTO> voters = new ArrayList<>();
 
         try (Reader reader = new InputStreamReader(file.getInputStream())) {
@@ -31,11 +39,15 @@ public class CsvImportServiceImpl implements CsvImportService {
                 throw new IllegalArgumentException("CSV must contain voters");
             }
 
+
             Set<String> emails = new HashSet<>();
 
             for (int i = 1; i < rows.size(); i++) {
 
                 String[] row = rows.get(i);
+
+                if(row.length < 2)
+                    throw new IllegalArgumentException("Invalid CSV format");
 
                 String name = row[0].trim();
                 String email = row[1].trim();

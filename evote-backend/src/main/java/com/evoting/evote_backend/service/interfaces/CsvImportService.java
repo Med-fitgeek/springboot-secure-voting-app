@@ -6,6 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface CsvImportService {
-    List<VoterDTO> parseVotersCsv(MultipartFile file);
+    List<VoterDTO> parseVotersCsv(MultipartFile file, String username);
 
 }
