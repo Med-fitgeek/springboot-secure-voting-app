@@ -1,5 +1,6 @@
 package com.evoting.evote_backend.mapper;
 
+import com.evoting.evote_backend.dto.ElectionRequestDTO;
 import com.evoting.evote_backend.dto.ElectionResponseDTO;
 import com.evoting.evote_backend.dto.OptionDTO;
 import com.evoting.evote_backend.entity.Election;
@@ -14,4 +15,5 @@ public interface ElectionMapper {
     ElectionResponseDTO toDto(Election election);
     List<ElectionResponseDTO> toDtoList(List<Election> elections);
     OptionDTO toDto(Option option);
+    Election toEntity(ElectionRequestDTO electionRequestDTO);
 }
