@@ -4,8 +4,6 @@ import com.evoting.evote_backend.dto.ElectionRequestDTO;
 import com.evoting.evote_backend.dto.ElectionResponseDTO;
 import com.evoting.evote_backend.dto.ElectionResultDTO;
 import com.evoting.evote_backend.dto.VoterTokenResponseDTO;
-import com.evoting.evote_backend.entity.Election;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -15,6 +13,6 @@ public interface ElectionService {
     void deleteElection(Long id, String username);
     ElectionResponseDTO getElectionById(Long id, String username);
     List<ElectionResponseDTO> getElectionsByCreator(String username);
-    List<ElectionResultDTO> getElectionResults(Long electionId);
+    List<ElectionResultDTO> getElectionResults(Long electionId, String username);
 
 }

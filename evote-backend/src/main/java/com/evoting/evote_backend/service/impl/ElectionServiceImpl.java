@@ -12,7 +12,6 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -38,7 +37,7 @@ public class ElectionServiceImpl implements ElectionService {
     ) {
 
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         validateElectionDates(dto);
 
@@ -149,7 +148,11 @@ public class ElectionServiceImpl implements ElectionService {
     }
 
     @Override
-    public List<ElectionResultDTO> getElectionResults(Long electionId) {
+    public List<ElectionResultDTO> getElectionResults(Long electionId, String username) {
+
+        userRepository.findByUsername(username)
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+
         Election election = electionRepository.findById(electionId)
                 .orElseThrow(() -> new BusinessException("Élection introuvable"));
 
