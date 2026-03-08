@@ -1,16 +1,16 @@
 package com.evoting.evote_backend.controller;
 
-import com.evoting.evote_backend.dto.ElectionRequestDTO;
-import com.evoting.evote_backend.dto.ElectionResponseDTO;
-import com.evoting.evote_backend.dto.ElectionResultDTO;
-import com.evoting.evote_backend.dto.VoterTokenResponseDTO;
+import com.evoting.evote_backend.dto.*;
 import com.evoting.evote_backend.entity.User;
+import com.evoting.evote_backend.service.interfaces.CsvImportService;
 import com.evoting.evote_backend.service.interfaces.ElectionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,11 +20,13 @@ import java.util.List;
 public class ElectionController {
 
     private final ElectionService electionService;
+    private final CsvImportService csvImportService;
 
     @PostMapping("/create")
     @PreAuthorize("hasRole('USER')") // ou 'ELECTION_CREATOR' selon ton enum
     public ResponseEntity<List<VoterTokenResponseDTO>> createElection(
-            @RequestBody ElectionRequestDTO request,
+            MultipartFile file,
+            @RequestBody @Valid ElectionRequestDTO request,
             Authentication authentication
     ) {
         User user = (User) authentication.getPrincipal();
@@ -66,5 +68,16 @@ public class ElectionController {
         String username = authentication.getName();
         electionService.updateElection(id, dto, username);
         return ResponseEntity.ok("Election mis  jour");
+    }
+
+    @PostMapping("/upload-voters")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<List<VoterDTO>> uploadVoters(
+            @RequestParam("file") MultipartFile file
+    ) {
+
+        List<VoterDTO> voters = csvImportService.parseVotersCsv(file);
+
+        return ResponseEntity.ok(voters);
     }
 }
