@@ -1,5 +1,6 @@
 package com.evoting.evote_backend.service.interfaces;
 
+import com.evoting.evote_backend.dto.VotePageDTO;
 import com.evoting.evote_backend.dto.VoteRequestDTO;
 import com.evoting.evote_backend.dto.VoterDTO;
 import com.evoting.evote_backend.entity.Election;
@@ -14,4 +15,5 @@ public interface VoterTokenService {
             Election election,
             List<VoterDTO> voters
     );
+    VotePageDTO getElectionForVote(UUID token);
 }

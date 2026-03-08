@@ -1,5 +1,6 @@
 package com.evoting.evote_backend.controller;
 
+import com.evoting.evote_backend.dto.VotePageDTO;
 import com.evoting.evote_backend.dto.VoteRequestDTO;
 import com.evoting.evote_backend.service.interfaces.VoterTokenService;
 import jakarta.validation.Valid;
@@ -7,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/vote")
@@ -22,5 +25,15 @@ public class VoteController {
         voterTokenService.vote(request);
 
         return ResponseEntity.ok("Vote recorded successfully");
+    }
+
+    @GetMapping("/{token}")
+    public ResponseEntity<VotePageDTO> getElectionForVote(
+            @PathVariable UUID token
+    ) {
+
+        return ResponseEntity.ok(
+                voterTokenService.getElectionForVote(token)
+        );
     }
 }

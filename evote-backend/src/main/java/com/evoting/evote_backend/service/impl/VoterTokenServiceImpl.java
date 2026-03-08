@@ -1,5 +1,7 @@
 package com.evoting.evote_backend.service.impl;
 
+import com.evoting.evote_backend.dto.OptionDTO;
+import com.evoting.evote_backend.dto.VotePageDTO;
 import com.evoting.evote_backend.dto.VoteRequestDTO;
 import com.evoting.evote_backend.dto.VoterDTO;
 import com.evoting.evote_backend.entity.Election;
@@ -79,6 +81,43 @@ public class VoterTokenServiceImpl implements VoterTokenService {
                 .toList();
 
         return voterTokenRepository.saveAll(tokens);
+    }
+
+    @Override
+    public VotePageDTO getElectionForVote(UUID token) {
+
+        VoterToken voterToken = voterTokenRepository
+                .findByToken(token)
+                .orElseThrow(() -> new BusinessException("Invalid voting token"));
+
+        if (voterToken.isUsed()) {
+            throw new BusinessException("This voting link has already been used");
+        }
+
+        Election election = voterToken.getElection();
+
+        LocalDateTime now = LocalDateTime.now();
+
+        if (now.isBefore(election.getStartDate())) {
+            throw new BusinessException("Voting has not started yet");
+        }
+
+        if (now.isAfter(election.getEndDate())) {
+            throw new BusinessException("Voting period has ended");
+        }
+
+        List<OptionDTO> options = election.getOptions()
+                .stream()
+                .map(o -> new OptionDTO(o.getId(), o.getLabel()))
+                .toList();
+
+        return new VotePageDTO(
+                election.getId(),
+                election.getTitle(),
+                election.getDescription(),
+                election.getEndDate(),
+                options
+        );
     }
 }
 

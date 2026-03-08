@@ -20,7 +20,7 @@ public class EmailServiceImpl implements EmailService {
 
         for (VoterToken token : tokens) {
 
-            String link = "https://app.com/vote?token=" + token.getToken();
+            String link = "https://app.com/vote/" + token.getToken();
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(token.getEmail());
