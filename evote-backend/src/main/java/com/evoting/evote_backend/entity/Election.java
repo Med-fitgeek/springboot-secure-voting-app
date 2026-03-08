@@ -8,27 +8,41 @@ import java.time.LocalDateTime;
 
 
 @Entity
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Election {
+@Table(indexes = {
+        @Index(name = "idx_election_creator", columnList = "created_by"),
+        @Index(name = "idx_election_dates", columnList = "startDate,endDate")
+})
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class Election extends BaseEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
+    @Column(length = 2000)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "created_by")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @OneToMany(mappedBy = "election", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Option> options;
 
+    @Column(nullable = false)
     private LocalDateTime startDate;
 
+    @Column(nullable = false)
     private LocalDateTime endDate;
 
     @OneToMany(mappedBy = "election", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<VoterToken> voterTokens;
+
 }
