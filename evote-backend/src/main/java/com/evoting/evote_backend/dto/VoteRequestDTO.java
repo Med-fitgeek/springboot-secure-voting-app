@@ -5,7 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record VoteRequestDTO(
-        @NotNull
+
+        @NotNull(message = "Voting token is required")
         UUID token,
-        @NotNull
-        Long optionId) {}
+
+        @NotNull(message = "Option id is required")
+        Long optionId
+
+) {}
