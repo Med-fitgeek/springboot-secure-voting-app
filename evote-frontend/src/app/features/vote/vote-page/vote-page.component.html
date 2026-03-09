@@ -1,0 +1,40 @@
+<div class="container mt-5" *ngIf="election">
+
+  <h2>{{ election.title }}</h2>
+  <p>{{ election.description }}</p>
+
+  <hr>
+
+  <form (ngSubmit)="submitVote()">
+
+    <div class="form-check"
+         *ngFor="let option of election.options">
+
+      <input
+        class="form-check-input"
+        type="radio"
+        name="vote"
+        [value]="option.id"
+        [(ngModel)]="selectedOptionId">
+
+      <label class="form-check-label">
+        {{ option.label }}
+      </label>
+
+    </div>
+
+    <button class="btn btn-primary mt-3">
+      Submit Vote
+    </button>
+
+  </form>
+
+  <div class="alert alert-success mt-3" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <div class="alert alert-danger mt-3" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+
+</div>
