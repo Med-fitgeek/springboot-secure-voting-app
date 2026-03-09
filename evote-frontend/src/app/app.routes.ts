@@ -32,7 +32,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
         import('./features/election/my-elections/my-elections.component').then(m => m.MyElectionsComponent)
-}
+  }
 
 
 ];

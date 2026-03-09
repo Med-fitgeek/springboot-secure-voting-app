@@ -28,8 +28,8 @@ export class LoginComponent {
   if (this.loginForm.invalid) return;
 
   this.authService.login(this.loginForm.value).subscribe({
-    next: (res) => {
-      this.authService.saveToken(res.token); // ⬅️ appel manuel ici
+    next: (token: string) => {
+      this.authService.saveToken(token);
       this.router.navigate(['/dashboard']);
     },
     error: err => console.error('Erreur de connexion', err)
