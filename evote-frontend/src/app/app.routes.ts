@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
 import { authGuard } from './core/guards/auth.guards';
+import { AdminLayoutComponent } from './layout/admin-layout/admin-layout.component';
 
 export const routes: Routes = [
   {
@@ -17,9 +18,32 @@ export const routes: Routes = [
   },
   {
     path: 'dashboard',
+    component: AdminLayoutComponent,
     canActivate: [authGuard],
-    loadComponent: () =>
-        import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent)
+    children: [
+
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/dashboard/dashboard.component')
+            .then(m => m.DashboardComponent)
+      },
+
+      {
+        path: 'my-elections',
+        loadComponent: () =>
+          import('./features/election/my-elections/my-elections.component')
+            .then(m => m.MyElectionsComponent)
+      },
+
+      {
+        path: 'create-election',
+        loadComponent: () =>
+          import('./features/election/create-election/create-election.component')
+            .then(m => m.CreateElectionComponent)
+      }
+
+    ]
   },
   {
     path: 'dashboard/create-election',

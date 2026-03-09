@@ -1,0 +1,36 @@
+.sidebar {
+  width: 220px;
+  background: #111827;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.logo {
+  margin-bottom: 30px;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+a {
+  color: white;
+  text-decoration: none;
+}
+
+a:hover {
+  color: #60a5fa;
+}
+
+.logout {
+  margin-top: auto;
+  background: #ef4444;
+  border: none;
+  padding: 10px;
+  color: white;
+  border-radius: 6px;
+}
