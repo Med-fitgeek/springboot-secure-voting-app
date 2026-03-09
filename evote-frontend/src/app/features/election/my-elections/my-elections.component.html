@@ -22,7 +22,11 @@
       [routerLink]="['/dashboard/election', election.id]">
       View
     </button>
-    <button class="btn btn-sm btn-outline-secondary me-2" (click)="onEditElection(election.id)">Modifier</button>
+    <button
+      class="btn btn-warning"
+      [routerLink]="['/dashboard/election', election.id, 'edit']">
+      Modifier
+    </button>
     <button class="btn btn-sm btn-outline-danger" (click)="onDeleteElection(election.id)">Supprimer</button>
   </div>
 </div>

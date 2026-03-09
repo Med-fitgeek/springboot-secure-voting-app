@@ -41,6 +41,13 @@ export const routes: Routes = [
         .then(m => m.ElectionDetailsComponent)
   },
   {
+    path: 'dashboard/election/:id/edit',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/election/edit-election/edit-election.component')
+        .then(m => m.EditElectionComponent)
+  },
+  {
     path: 'dashboard/election/:id/results',
     canActivate: [authGuard],
     loadComponent: () =>
