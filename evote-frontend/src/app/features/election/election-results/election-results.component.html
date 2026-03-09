@@ -1,10 +1,17 @@
 <div class="container mt-5">
 
-  <h2>Election Results</h2>
+  <h2 class="mb-4">
+    Election Results
+  </h2>
 
-  <canvas #chartCanvas></canvas>
+  <div class="card p-4 shadow-sm">
+
+    <canvas #chartCanvas></canvas>
+
+  </div>
 
   <table class="table mt-4">
+
     <thead>
       <tr>
         <th>Option</th>
@@ -13,10 +20,12 @@
     </thead>
 
     <tbody>
+
       <tr *ngFor="let result of results">
         <td>{{ result.label }}</td>
         <td>{{ result.votes }}</td>
       </tr>
+
     </tbody>
 
   </table>

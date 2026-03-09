@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { ElectionService } from '../../../core/services/election.service';
 import { Chart } from 'chart.js/auto';
+import { ElectionService } from '../../../core/services/election.service';
 
 @Component({
   selector: 'app-election-results',
@@ -17,7 +17,6 @@ export class ElectionResultsComponent implements OnInit {
 
   electionId!: number;
   results: any[] = [];
-  chart!: Chart;
 
   constructor(
     private route: ActivatedRoute,
@@ -25,39 +24,66 @@ export class ElectionResultsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+
     this.electionId = Number(this.route.snapshot.paramMap.get('id'));
 
     this.electionService.getResults(this.electionId).subscribe({
+
       next: (data) => {
+
         this.results = data;
-        setTimeout(() => this.renderChart(), 0);
+
+        setTimeout(() => {
+          this.createChart();
+        });
+
       },
-      error: (err) => console.error('Error loading results', err)
+
+      error: err => console.error(err)
+
     });
+
   }
 
-  renderChart() {
+  createChart() {
 
     const labels = this.results.map(r => r.label);
     const votes = this.results.map(r => r.votes);
 
-    this.chart = new Chart(this.chartCanvas.nativeElement, {
-      type: 'bar',
+    new Chart(this.chartCanvas.nativeElement, {
+
+      type: 'doughnut',
+
       data: {
+
         labels: labels,
+
         datasets: [
+
           {
-            label: 'Votes',
             data: votes,
             backgroundColor: [
-              '#0d6efd',
-              '#198754',
-              '#ffc107',
-              '#dc3545'
+              '#3b82f6',
+              '#22c55e',
+              '#f59e0b',
+              '#ef4444',
+              '#8b5cf6'
             ]
           }
+
         ]
+
+      },
+
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
       }
+
     });
 
   }
