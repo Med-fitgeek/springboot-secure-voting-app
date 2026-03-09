@@ -1,45 +1,45 @@
-<div class="container">
-  <h2 class="mb-4 fw-bold text-primary">Tableau de bord</h2>
+<div class="container mt-5">
 
-  <div class="row mb-4">
-    <div class="col-md-4 mb-3">
-      <div class="card shadow-sm border-primary">
-        <div class="card-body text-center">
-          <h5 class="card-title">Élections créées</h5>
-          <p class="display-6 fw-bold text-primary">{{ stats.elections }}</p>
+  <h2 class="mb-4">Dashboard</h2>
+
+  <div class="row g-4">
+
+    <div class="col-md-3">
+      <div class="card stat-card bg-primary text-white">
+        <div class="card-body">
+          <h5>Total Elections</h5>
+          <h2>{{ stats.elections }}</h2>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-      <div class="card shadow-sm border-success">
-        <div class="card-body text-center">
-          <h5 class="card-title">Votants total</h5>
-          <p class="display-6 fw-bold text-success">{{ stats.totalVoters }}</p>
+    <div class="col-md-3">
+      <div class="card stat-card bg-success text-white">
+        <div class="card-body">
+          <h5>Total Voters</h5>
+          <h2>{{ stats.voters }}</h2>
         </div>
       </div>
     </div>
 
-    <div class="col-md-4 mb-3">
-      <div class="card shadow-sm border-warning">
-        <div class="card-body text-center">
-          <h5 class="card-title">Votes enregistrés</h5>
-          <p class="display-6 fw-bold text-warning">{{ stats.votesCast }}</p>
+    <div class="col-md-3">
+      <div class="card stat-card bg-warning text-dark">
+        <div class="card-body">
+          <h5>Votes Cast</h5>
+          <h2>{{ stats.votes }}</h2>
         </div>
       </div>
     </div>
+
+    <div class="col-md-3">
+      <div class="card stat-card bg-dark text-white">
+        <div class="card-body">
+          <h5>Active Elections</h5>
+          <h2>{{ stats.active }}</h2>
+        </div>
+      </div>
+    </div>
+
   </div>
 
-  <div class="row mt-4">
-    <div class="col-md-6 mb-3">
-      <a class="btn btn-primary w-100 py-3" routerLink="create-election">
-        + Créer une nouvelle élection
-      </a>
-    </div>
-    <div class="col-md-6 mb-3">
-      <a class="btn btn-outline-secondary w-100 py-3" routerLink="my-elections">
-        📋 Voir mes élections
-      </a>
-    </div>
-  </div>
 </div>
