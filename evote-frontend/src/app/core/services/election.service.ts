@@ -46,4 +46,13 @@ export class ElectionService {
   getElectionForVote(token: string): Observable<any> {
     return this.http.get(`/api/vote/${token}`);
   }
+
+  uploadVoters(file: File) {
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    return this.http.post<any[]>('/api/elections/upload-voters', formData);
+
+  }
 }

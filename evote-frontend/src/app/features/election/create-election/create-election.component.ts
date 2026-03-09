@@ -93,4 +93,33 @@ export class CreateElectionComponent {
 
   }
 
+  uploadCsv(event: any) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    this.electionService.uploadVoters(file).subscribe({
+
+      next: (voters) => {
+
+        voters.forEach((v: any) => {
+
+          const voterGroup = this.fb.group({
+            name: [v.name],
+            email: [v.email]
+          });
+
+          this.voters.push(voterGroup);
+
+        });
+
+      },
+
+      error: err => console.error('CSV import error', err)
+
+    });
+
+  }
+
 }
