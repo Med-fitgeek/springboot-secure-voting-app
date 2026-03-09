@@ -1,33 +1,55 @@
-// create-election.component.ts
-import { Component, NgModule } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormArray,
+  Validators,
+  ReactiveFormsModule
+} from '@angular/forms';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ElectionService } from '../../../core/services/election.service';
 
 @Component({
   selector: 'app-create-election',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './create-election.component.html',
+  styleUrl: './create-election.component.scss'
 })
 export class CreateElectionComponent {
-  form: FormGroup;
 
-  constructor(private fb: FormBuilder) {
-    this.form = this.fb.group({
+  electionForm: FormGroup;
+
+  constructor(
+    private fb: FormBuilder,
+    private electionService: ElectionService,
+    private router: Router
+  ) {
+
+    this.electionForm = this.fb.group({
+
       title: ['', Validators.required],
       description: [''],
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
-      options: this.fb.array([this.fb.control('', Validators.required)]),
-      voters: this.fb.array([this.fb.control('', Validators.required)])
+
+      options: this.fb.array([
+        this.fb.control('', Validators.required)
+      ]),
+
+      voters: this.fb.array([])
+
     });
+
   }
 
-  get options() {
-    return this.form.get('options') as FormArray;
+  get options(): FormArray {
+    return this.electionForm.get('options') as FormArray;
   }
 
-  get voters() {
-    return this.form.get('voters') as FormArray;
+  get voters(): FormArray {
+    return this.electionForm.get('voters') as FormArray;
   }
 
   addOption() {
@@ -39,15 +61,36 @@ export class CreateElectionComponent {
   }
 
   addVoter() {
-    this.voters.push(this.fb.control('', Validators.required));
+
+    const voterGroup = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.voters.push(voterGroup);
+
   }
 
   removeVoter(index: number) {
     this.voters.removeAt(index);
   }
 
-  submit() {
-    if (this.form.invalid) return;
-    console.log(this.form.value); // ensuite appel au service
+  onSubmit() {
+
+    if (this.electionForm.invalid) return;
+
+    this.electionService.createElection(this.electionForm.value)
+      .subscribe({
+
+        next: () => {
+          alert('Election created successfully');
+          this.router.navigate(['/dashboard/my-elections']);
+        },
+
+        error: err => console.error(err)
+
+      });
+
   }
+
 }

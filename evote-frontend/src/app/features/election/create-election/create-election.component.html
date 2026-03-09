@@ -1,41 +1,118 @@
-<form [formGroup]="form" (ngSubmit)="submit()" class="container mt-4">
-  <div class="mb-3">
-    <label>Titre</label>
-    <input formControlName="title" class="form-control" />
-  </div>
+<div class="container mt-5">
 
-  <div class="mb-3">
-    <label>Description</label>
-    <textarea formControlName="description" class="form-control"></textarea>
-  </div>
+  <h2>Create Election</h2>
 
-  <div class="mb-3">
-    <label>Date de début</label>
-    <input type="datetime-local" formControlName="startDate" class="form-control" />
-  </div>
+  <form [formGroup]="electionForm" (ngSubmit)="onSubmit()">
 
-  <div class="mb-3">
-    <label>Date de fin</label>
-    <input type="datetime-local" formControlName="endDate" class="form-control" />
-  </div>
-
-  <div class="mb-3">
-    <label>Options de vote</label>
-    <div *ngFor="let opt of options.controls; let i = index" class="input-group mb-2">
-      <input [formControl]="opt" class="form-control" />
-      <button type="button" class="btn btn-danger" (click)="removeOption(i)">-</button>
+    <div class="mb-3">
+      <label>Title</label>
+      <input class="form-control" formControlName="title">
     </div>
-    <button type="button" class="btn btn-outline-primary" (click)="addOption()">+ Ajouter une option</button>
-  </div>
 
-  <div class="mb-3">
-    <label>Votants</label>
-    <div *ngFor="let voter of voters.controls; let i = index" class="input-group mb-2">
-      <input [formControl]="voter" class="form-control" placeholder="Nom ou email" />
-      <button type="button" class="btn btn-danger" (click)="removeVoter(i)">-</button>
+    <div class="mb-3">
+      <label>Description</label>
+      <textarea class="form-control" formControlName="description"></textarea>
     </div>
-    <button type="button" class="btn btn-outline-primary" (click)="addVoter()">+ Ajouter un votant</button>
+
+    <div class="mb-3">
+      <label>Start Date</label>
+      <input type="datetime-local" class="form-control" formControlName="startDate">
+    </div>
+
+    <div class="mb-3">
+      <label>End Date</label>
+      <input type="datetime-local" class="form-control" formControlName="endDate">
+    </div>
+
+---
+
+<h4>Options</h4>
+
+<div formArrayName="options">
+
+  <div *ngFor="let option of options.controls; let i = index"
+       class="input-group mb-2">
+
+    <input
+      class="form-control"
+      [formControlName]="i">
+
+    <button
+      class="btn btn-danger"
+      type="button"
+      (click)="removeOption(i)">
+
+      Remove
+    </button>
+
   </div>
 
-  <button class="btn btn-success" [disabled]="form.invalid">Créer l’élection</button>
+</div>
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  (click)="addOption()">
+
+  Add Option
+</button>
+
+---
+
+<h4 class="mt-4">Voters</h4>
+
+<div formArrayName="voters">
+
+  <div *ngFor="let voter of voters.controls; let i = index"
+       [formGroupName]="i"
+       class="row mb-2">
+
+    <div class="col">
+      <input
+        class="form-control"
+        formControlName="name"
+        placeholder="Name">
+    </div>
+
+    <div class="col">
+      <input
+        class="form-control"
+        formControlName="email"
+        placeholder="Email">
+    </div>
+
+    <div class="col-auto">
+
+      <button
+        class="btn btn-danger"
+        type="button"
+        (click)="removeVoter(i)">
+
+        Remove
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+<button
+  type="button"
+  class="btn btn-secondary"
+  (click)="addVoter()">
+
+  Add Voter
+</button>
+
+---
+
+<br><br>
+
+<button class="btn btn-primary">
+  Create Election
+</button>
+
 </form>
+
+</div>
