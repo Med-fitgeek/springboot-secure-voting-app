@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ElectionService } from '../../../core/services/election.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-vote-page',
@@ -21,7 +22,9 @@ export class VotePageComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private electionService: ElectionService
+    private electionService: ElectionService,
+    private toastr: ToastrService
+
   ) {}
 
   ngOnInit(): void {
@@ -29,14 +32,14 @@ export class VotePageComponent implements OnInit {
 
     this.electionService.getElectionForVote(this.token).subscribe({
       next: (data) => this.election = data,
-      error: () => this.errorMessage = 'Invalid or expired voting link.'
+      error: () => this.toastr.error('Invalid or expired voting link.')
     });
   }
 
   submitVote() {
 
     if (!this.selectedOptionId) {
-      this.errorMessage = 'Please select an option.';
+      this.toastr.error('Please select an option.');
       return;
     }
 
@@ -47,11 +50,11 @@ export class VotePageComponent implements OnInit {
 
     this.electionService.vote(request).subscribe({
       next: () => {
-        this.successMessage = 'Your vote has been recorded successfully!';
+        this.toastr.success('Your vote has been recorded');
         this.errorMessage = '';
       },
       error: () => {
-        this.errorMessage = 'Unable to submit vote.';
+        this.toastr.error('Unable to submit vote');
       }
     });
 

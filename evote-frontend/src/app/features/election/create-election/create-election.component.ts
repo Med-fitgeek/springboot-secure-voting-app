@@ -9,6 +9,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ElectionService } from '../../../core/services/election.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-create-election',
@@ -24,7 +25,8 @@ export class CreateElectionComponent {
   constructor(
     private fb: FormBuilder,
     private electionService: ElectionService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {
 
     this.electionForm = this.fb.group({
@@ -83,7 +85,7 @@ export class CreateElectionComponent {
       .subscribe({
 
         next: () => {
-          alert('Election created successfully');
+          this.toastr.success('Election created successfully');
           this.router.navigate(['/dashboard/my-elections']);
         },
 
