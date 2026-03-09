@@ -32,8 +32,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () =>
         import('./features/election/my-elections/my-elections.component').then(m => m.MyElectionsComponent)
-  }
-
-
+  },
+  {
+    path: 'dashboard/election/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/election/election-details/election-details.component')
+        .then(m => m.ElectionDetailsComponent)
+  },
+  {
+    path: 'dashboard/election/:id/results',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/election/election-results/election-results.component')
+        .then(m => m.ElectionResultsComponent)
+  },
 ];
 

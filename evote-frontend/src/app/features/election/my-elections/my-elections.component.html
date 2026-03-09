@@ -12,7 +12,16 @@
       <strong>Début :</strong> {{ election.startDate | date:'short' }} <br />
       <strong>Fin :</strong> {{ election.endDate | date:'short' }}
     </p>
-    <button class="btn btn-sm btn-outline-primary me-2" (click)="onViewResults(election.id)">Voir résultats</button>
+    <button
+      class="btn btn-info"
+      [routerLink]="['/dashboard/election', election.id, 'results']">
+      Voir resultats
+    </button>
+    <button
+      class="btn btn-primary"
+      [routerLink]="['/dashboard/election', election.id]">
+      View
+    </button>
     <button class="btn btn-sm btn-outline-secondary me-2" (click)="onEditElection(election.id)">Modifier</button>
     <button class="btn btn-sm btn-outline-danger" (click)="onDeleteElection(election.id)">Supprimer</button>
   </div>

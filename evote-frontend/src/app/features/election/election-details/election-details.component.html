@@ -1,0 +1,46 @@
+<div class="container mt-5" *ngIf="election">
+
+  <h2>{{ election.title }}</h2>
+  <p>{{ election.description }}</p>
+
+  <hr>
+
+  <div class="mb-3">
+    <strong>Start:</strong> {{ election.startDate }}
+  </div>
+
+  <div class="mb-3">
+    <strong>End:</strong> {{ election.endDate }}
+  </div>
+
+  <h4 class="mt-4">Options</h4>
+
+  <ul class="list-group">
+
+    <li class="list-group-item"
+        *ngFor="let option of election.options">
+
+        {{ option }}
+    </li>
+
+  </ul>
+
+  <div class="mt-4">
+
+    <button
+      class="btn btn-info me-2"
+      [routerLink]="['/dashboard/election', election.id, 'results']">
+
+      View Results
+    </button>
+
+    <button
+      class="btn btn-danger"
+      (click)="deleteElection()">
+
+      Delete Election
+    </button>
+
+  </div>
+
+</div>
