@@ -3,5 +3,5 @@ import java.util.UUID;
 
 public record VoterTokenResponseDTO(
         String voterEmail,
-        UUID token
+        String token
 ) {}

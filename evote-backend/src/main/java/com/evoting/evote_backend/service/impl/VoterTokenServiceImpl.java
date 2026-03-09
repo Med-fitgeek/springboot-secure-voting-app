@@ -1,21 +1,21 @@
 package com.evoting.evote_backend.service.impl;
 
-import com.evoting.evote_backend.dto.OptionDTO;
-import com.evoting.evote_backend.dto.VotePageDTO;
-import com.evoting.evote_backend.dto.VoteRequestDTO;
-import com.evoting.evote_backend.dto.VoterDTO;
+import com.evoting.evote_backend.dto.*;
 import com.evoting.evote_backend.entity.Election;
 import com.evoting.evote_backend.entity.Option;
 import com.evoting.evote_backend.entity.VoterToken;
 import com.evoting.evote_backend.exception.BusinessException;
 import com.evoting.evote_backend.repository.OptionRepository;
 import com.evoting.evote_backend.repository.VoterTokenRepository;
+import com.evoting.evote_backend.service.interfaces.TokenGenerationService;
+import com.evoting.evote_backend.service.interfaces.TokenHashService;
 import com.evoting.evote_backend.service.interfaces.VoterTokenService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,13 +25,15 @@ public class VoterTokenServiceImpl implements VoterTokenService {
 
     private final VoterTokenRepository voterTokenRepository;
     private final OptionRepository optionRepository;
+    private final TokenGenerationService tokenGenerationService;
+    private final TokenHashService tokenHashService;
 
     @Transactional
     @Override
     public void vote(VoteRequestDTO request) {
 
         VoterToken voterToken = voterTokenRepository
-                .findByToken(request.token())
+                .findByTokenHash(tokenHashService.hashToken(request.token()))
                 .orElseThrow(() -> new IllegalArgumentException("Invalid token"));
 
         if (voterToken.isUsed()) {
@@ -64,30 +66,44 @@ public class VoterTokenServiceImpl implements VoterTokenService {
 
     @Transactional
     @Override
-    public List<VoterToken> generateTokens(
+    public List<VoterTokenResponseDTO> generateTokens(
             Election election,
             List<VoterDTO> voters
     ) {
 
-        List<VoterToken> tokens = voters.stream()
-                .map(voter -> VoterToken.builder()
-                        .email(voter.email())
-                        .name(voter.name())
-                        .token(UUID.randomUUID())
-                        .used(false)
-                        .election(election)
-                        .build()
-                )
-                .toList();
+        List<VoterToken> tokensToSave = new ArrayList<>();
+        List<VoterTokenResponseDTO> response = new ArrayList<>();
 
-        return voterTokenRepository.saveAll(tokens);
+        for ( VoterDTO voter : voters ) {
+
+            String rawToken = tokenGenerationService.generateToken();
+            String tokenHash = tokenHashService.hashToken(rawToken);
+
+            VoterToken voterToken = VoterToken.builder()
+                    .email(voter.email())
+                    .name(voter.name())
+                    .tokenHash(tokenHash)
+                    .used(false)
+                    .election(election)
+                    .build();
+
+            tokensToSave.add(voterToken);
+
+            response.add(new VoterTokenResponseDTO(
+                    voter.email(),
+                    rawToken
+            ));
+        }
+
+        voterTokenRepository.saveAll(tokensToSave);
+        return response;
     }
 
     @Override
-    public VotePageDTO getElectionForVote(UUID token) {
+    public VotePageDTO getElectionForVote(String token) {
 
         VoterToken voterToken = voterTokenRepository
-                .findByToken(token)
+                .findByTokenHash(tokenHashService.hashToken(token))
                 .orElseThrow(() -> new BusinessException("Invalid voting token"));
 
         if (voterToken.isUsed()) {

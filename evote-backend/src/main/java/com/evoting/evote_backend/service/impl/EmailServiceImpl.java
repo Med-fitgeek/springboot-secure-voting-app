@@ -1,5 +1,6 @@
 package com.evoting.evote_backend.service.impl;
 
+import com.evoting.evote_backend.dto.VoterTokenResponseDTO;
 import com.evoting.evote_backend.entity.VoterToken;
 import com.evoting.evote_backend.exception.BusinessException;
 import com.evoting.evote_backend.service.interfaces.EmailService;
@@ -19,17 +20,17 @@ public class EmailServiceImpl implements EmailService {
 
     @Async
     @Override
-    public void sendVotingLinks(List<VoterToken> tokens) {
+    public void sendVotingLinks(List<VoterTokenResponseDTO> tokensDto) {
 
-        for (VoterToken token : tokens) {
+        for (VoterTokenResponseDTO token : tokensDto) {
 
-            String link = "http://localhost:3000/vote/" + token.getToken();
+            String link = "http://localhost:3000/vote/" + token.token();
 
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setTo(token.getEmail());
+            message.setTo(token.voterEmail());
             message.setSubject("Your voting link");
             message.setText(
-                    "Hello " + token.getName() +
+                    "Hello " + token.voterEmail() +
                             "\n\nVote here:\n" + link
             );
 

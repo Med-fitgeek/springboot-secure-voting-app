@@ -7,6 +7,7 @@ import com.evoting.evote_backend.mapper.ElectionMapper;
 import com.evoting.evote_backend.repository.*;
 import com.evoting.evote_backend.service.interfaces.ElectionService;
 import com.evoting.evote_backend.service.interfaces.EmailService;
+import com.evoting.evote_backend.service.interfaces.TokenHashService;
 import com.evoting.evote_backend.service.interfaces.VoterTokenService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,6 +28,7 @@ public class ElectionServiceImpl implements ElectionService {
     private final ElectionMapper electionMapper;
     private final VoterTokenService voterTokenService;
     private final EmailService emailService;
+    private final TokenHashService tokenHashService;
 
 
     @Transactional
@@ -46,19 +48,14 @@ public class ElectionServiceImpl implements ElectionService {
 
         electionRepository.save(election);
 
-        List<VoterToken> tokens = voterTokenService.generateTokens(
+        List<VoterTokenResponseDTO> tokensDto = voterTokenService.generateTokens(
                 election,
                 dto.voters()
         );
 
-        emailService.sendVotingLinks(tokens);
+        emailService.sendVotingLinks(tokensDto);
 
-        return tokens.stream()
-                .map(t -> new VoterTokenResponseDTO(
-                        t.getEmail(),
-                        t.getToken()
-                ))
-                .toList();
+        return tokensDto;
     }
 
     @Override
@@ -91,10 +88,11 @@ public class ElectionServiceImpl implements ElectionService {
         }
         election.setOptions(newOptions);
 
+
         List<VoterToken> newVoters = new ArrayList<>();
         for (VoterDTO name : dto.voters()) {
             VoterToken token = VoterToken.builder()
-                    .token(UUID.randomUUID())
+                    .tokenHash(UUID.randomUUID().toString())
                     .used(false)
                     .election(election)
                     .build();

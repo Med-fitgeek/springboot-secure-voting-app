@@ -29,7 +29,7 @@ public class VoterToken  {
     private String email;
 
     @Column(unique = true, nullable = false, updatable = false)
-    private UUID token;
+    private String tokenHash;
 
     @Column(nullable = false)
     private boolean used = false;

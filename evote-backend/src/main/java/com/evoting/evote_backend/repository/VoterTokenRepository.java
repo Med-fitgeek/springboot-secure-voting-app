@@ -11,7 +11,6 @@ import java.util.UUID;
 
 public interface VoterTokenRepository extends JpaRepository<VoterToken, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<VoterToken> findByToken(UUID token);
-    boolean existsByToken(UUID token);
+    Optional<VoterToken> findByTokenHash(String tokenHash);
     long countBySelectedOption(Option option);
 }

@@ -29,7 +29,7 @@ public class VoteController {
 
     @GetMapping("/{token}")
     public ResponseEntity<VotePageDTO> getElectionForVote(
-            @PathVariable UUID token
+            @PathVariable String token
     ) {
 
         return ResponseEntity.ok(
