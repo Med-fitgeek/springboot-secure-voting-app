@@ -1,9 +1,145 @@
-<div class="layout">
+<!-- ═══════════════════════════════════════════════
+     ADMIN LAYOUT — Navbar + contenu principal
+     ═══════════════════════════════════════════════ -->
+<div class="admin-shell">
 
-  <app-sidebar></app-sidebar>
+  <!-- ── NAVBAR ──────────────────────────────────── -->
+  <nav class="admin-navbar">
+    <div class="navbar-inner">
 
-  <main class="content">
-    <router-outlet></router-outlet>
+      <!-- Brand -->
+      <a routerLink="/dashboard" class="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 28 28" fill="none">
+            <rect width="28" height="28" rx="7" fill="var(--color-primary)"/>
+            <path d="M8 14.5L12 18.5L20 10" stroke="white" stroke-width="2.2"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">eVote</span>
+      </a>
+
+      <!-- Nav links -->
+      <ul class="nav-links">
+        <li>
+          <a routerLink="/dashboard"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }"
+             class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+              <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+            </svg>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/my-elections"
+             routerLinkActive="active"
+             class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+              <path d="M9 12h6M9 16h4"/>
+            </svg>
+            <span>Mes élections</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/dashboard/create-election"
+             routerLinkActive="active"
+             class="nav-item nav-item-cta">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+            <span>Nouvelle élection</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Right zone -->
+      <div class="nav-right">
+
+        <!-- User pill -->
+        <div class="user-pill" (click)="toggleUserMenu()" #userMenuTrigger>
+          <div class="user-avatar">
+            {{ userInitial }}
+          </div>
+          <span class="user-name">{{ username }}</span>
+          <svg class="chevron" [class.rotated]="userMenuOpen"
+               width="14" height="14" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+
+        <!-- Dropdown menu -->
+        <div class="user-dropdown" [class.open]="userMenuOpen">
+          <div class="dropdown-header">
+            <span class="dropdown-username">{{ username }}</span>
+            <span class="dropdown-role">Organisateur</span>
+          </div>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item" (click)="logout()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+            Se déconnecter
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Mobile burger -->
+      <button class="burger" (click)="toggleMobileMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" [class.open]="mobileMenuOpen">
+      <a routerLink="/dashboard"
+         routerLinkActive="active"
+         [routerLinkActiveOptions]="{ exact: true }"
+         class="mobile-nav-item"
+         (click)="mobileMenuOpen = false">
+        Dashboard
+      </a>
+      <a routerLink="/dashboard/my-elections"
+         routerLinkActive="active"
+         class="mobile-nav-item"
+         (click)="mobileMenuOpen = false">
+        Mes élections
+      </a>
+      <a routerLink="/dashboard/create-election"
+         routerLinkActive="active"
+         class="mobile-nav-item mobile-nav-cta"
+         (click)="mobileMenuOpen = false">
+        Nouvelle élection
+      </a>
+      <div class="mobile-divider"></div>
+      <button class="mobile-nav-item mobile-logout" (click)="logout()">
+        Se déconnecter
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── CONTENU PRINCIPAL ───────────────────────── -->
+  <main class="admin-main">
+    <router-outlet />
   </main>
 
 </div>
