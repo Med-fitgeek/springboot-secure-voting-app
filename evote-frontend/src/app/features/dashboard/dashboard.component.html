@@ -1,45 +1,171 @@
-<div class="container mt-5">
+<div class="page-container">
 
-  <h2 class="mb-4">Dashboard</h2>
+  <!-- ── Page header ──────────────────────────────── -->
+  <div class="page-header">
+    <div class="page-header-content">
+      <h1 class="page-title">Bonjour, {{ username }} 👋</h1>
+      <p class="page-subtitle">Voici un aperçu de vos activités électorales</p>
+    </div>
+    <a routerLink="/dashboard/create-election" class="btn btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+      </svg>
+      Nouvelle élection
+    </a>
+  </div>
 
-  <div class="row g-4">
+  <!-- ── Stat cards ────────────────────────────────── -->
+  <div class="stats-grid" *ngIf="!isLoading; else skeletonStats">
 
-    <div class="col-md-3">
-      <div class="card stat-card bg-primary text-white">
-        <div class="card-body">
-          <h5>Total Elections</h5>
-          <h2>{{ stats.elections }}</h2>
-        </div>
+    <!-- Total élections -->
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/>
+          <path d="M9 12h6M9 16h4"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total élections</span>
+        <span class="stat-value">{{ stats.elections }}</span>
+      </div>
+      <div class="stat-trend">
+        <span class="badge badge-primary">Toutes</span>
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card stat-card bg-success text-white">
-        <div class="card-body">
-          <h5>Total Voters</h5>
-          <h2>{{ stats.voters }}</h2>
-        </div>
+    <!-- Actives -->
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--success">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">En cours</span>
+        <span class="stat-value">{{ stats.active }}</span>
+      </div>
+      <div class="stat-trend">
+        <span class="badge badge-active">Actives</span>
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card stat-card bg-warning text-dark">
-        <div class="card-body">
-          <h5>Votes Cast</h5>
-          <h2>{{ stats.votes }}</h2>
-        </div>
+    <!-- Électeurs -->
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--info">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Total électeurs</span>
+        <span class="stat-value">{{ stats.voters }}</span>
+      </div>
+      <div class="stat-trend">
+        <span class="badge badge-primary">Invités</span>
       </div>
     </div>
 
-    <div class="col-md-3">
-      <div class="card stat-card bg-dark text-white">
-        <div class="card-body">
-          <h5>Active Elections</h5>
-          <h2>{{ stats.active }}</h2>
-        </div>
+    <!-- Votes exprimés -->
+    <div class="stat-card">
+      <div class="stat-icon stat-icon--warning">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 11 12 14 22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
+      <div class="stat-content">
+        <span class="stat-label">Votes exprimés</span>
+        <span class="stat-value">{{ stats.votes }}</span>
+      </div>
+      <div class="stat-trend">
+        <span class="stat-rate" *ngIf="stats.voters > 0">
+          {{ participationRate }}% participation
+        </span>
       </div>
     </div>
 
+  </div>
+
+  <!-- Skeleton chargement -->
+  <ng-template #skeletonStats>
+    <div class="stats-grid">
+      <div class="stat-card skeleton-card" *ngFor="let i of [1,2,3,4]">
+        <div class="skeleton" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+        <div class="stat-content">
+          <div class="skeleton" style="width: 80px; height: 12px; margin-bottom: 8px;"></div>
+          <div class="skeleton" style="width: 48px; height: 28px;"></div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <!-- ── Raccourcis ────────────────────────────────── -->
+  <div class="shortcuts-section">
+    <h2 class="section-title">Actions rapides</h2>
+    <div class="shortcuts-grid">
+
+      <a routerLink="/dashboard/my-elections" class="shortcut-card">
+        <div class="shortcut-icon shortcut-icon--primary">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="8" y1="6" x2="21" y2="6"/>
+            <line x1="8" y1="12" x2="21" y2="12"/>
+            <line x1="8" y1="18" x2="21" y2="18"/>
+            <line x1="3" y1="6" x2="3.01" y2="6"/>
+            <line x1="3" y1="12" x2="3.01" y2="12"/>
+            <line x1="3" y1="18" x2="3.01" y2="18"/>
+          </svg>
+        </div>
+        <div class="shortcut-text">
+          <span class="shortcut-title">Mes élections</span>
+          <span class="shortcut-desc">Gérer toutes vos élections</span>
+        </div>
+        <svg class="shortcut-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </a>
+
+      <a routerLink="/dashboard/create-election" class="shortcut-card shortcut-card--accent">
+        <div class="shortcut-icon shortcut-icon--white">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+        </div>
+        <div class="shortcut-text">
+          <span class="shortcut-title">Créer une élection</span>
+          <span class="shortcut-desc">Configurer et lancer un vote</span>
+        </div>
+        <svg class="shortcut-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </a>
+
+    </div>
   </div>
 
 </div>

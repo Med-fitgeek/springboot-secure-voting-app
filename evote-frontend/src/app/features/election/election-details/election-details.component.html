@@ -1,46 +1,165 @@
-<div class="container mt-5" *ngIf="election">
+<div class="page-container" *ngIf="!isLoading && election; else loadingOrError">
 
-  <h2>{{ election.title }}</h2>
-  <p>{{ election.description }}</p>
+  <!--  Breadcrumb  -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/dashboard/my-elections" class="breadcrumb-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Mes élections
+    </a>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">{{ election.title }}</span>
+  </nav>
 
-  <hr>
+  <!--  Header  -->
+  <div class="detail-header">
+    <div class="detail-header-left">
+      <div class="detail-badges">
+        <span class="badge" [ngClass]="statusBadge">{{ statusLabel }}</span>
+      </div>
+      <h1 class="page-title">{{ election.title }}</h1>
+      <p class="detail-desc">{{ election.description }}</p>
+    </div>
 
-  <div class="mb-3">
-    <strong>Start:</strong> {{ election.startDate }}
+    <div class="detail-header-actions">
+      <a [routerLink]="['/dashboard/election', election.id, 'results']"
+         class="btn btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Voir les résultats
+      </a>
+      <a *ngIf="canEdit"
+         [routerLink]="['/dashboard/election', election.id, 'edit']"
+         class="btn btn-outline-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Modifier
+      </a>
+      <button *ngIf="canEdit"
+              class="btn btn-outline-danger"
+              (click)="showDeleteModal = true">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+        </svg>
+        Supprimer
+      </button>
+    </div>
   </div>
 
-  <div class="mb-3">
-    <strong>End:</strong> {{ election.endDate }}
+  <!--  Info cards ─ -->
+  <div class="info-grid">
+
+    <div class="info-card">
+      <div class="info-icon info-icon--primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+      </div>
+      <div>
+        <span class="info-label">Date de début</span>
+        <span class="info-value">{{ election.startDate | date:'dd MMMM yyyy, HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon--warning">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <polyline points="12 6 12 12 16 14"/>
+        </svg>
+      </div>
+      <div>
+        <span class="info-label">Date de fin</span>
+        <span class="info-value">{{ election.endDate | date:'dd MMMM yyyy, HH:mm' }}</span>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="info-icon info-icon--success">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
+          <rect x="9" y="3" width="6" height="4" rx="1"/>
+          <path d="M9 12h6M9 16h4"/>
+        </svg>
+      </div>
+      <div>
+        <span class="info-label">Nombre d'options</span>
+        <span class="info-value">{{ election.options?.length ?? 0 }} options</span>
+      </div>
+    </div>
+
   </div>
 
-  <h4 class="mt-4">Options</h4>
-
-  <ul class="list-group">
-
-    <li class="list-group-item"
-        *ngFor="let option of election.options">
-
-        {{ option }}
-    </li>
-
-  </ul>
-
-  <div class="mt-4">
-
-    <button
-      class="btn btn-info me-2"
-      [routerLink]="['/dashboard/election', election.id, 'results']">
-
-      View Results
-    </button>
-
-    <button
-      class="btn btn-danger"
-      (click)="deleteElection()">
-
-      Delete Election
-    </button>
-
+  <!--  Options  -->
+  <div class="section-card">
+    <h2 class="section-card-title">Options de vote</h2>
+    <div class="options-list">
+      <div class="option-item" *ngFor="let option of election.options; let i = index">
+        <div class="option-index">{{ i + 1 }}</div>
+        <span class="option-label">{{ option.label }}</span>
+      </div>
+    </div>
   </div>
 
+</div>
+
+<!--  Loading / Error  -->
+<ng-template #loadingOrError>
+  <div class="page-container">
+    <div class="empty-state" *ngIf="!isLoading && !election">
+      <div class="empty-state-icon">⚠️</div>
+      <p class="empty-state-title">Élection introuvable</p>
+      <p class="empty-state-text">Cette élection n'existe pas ou vous n'y avez pas accès.</p>
+      <a routerLink="/dashboard/my-elections" class="btn btn-primary">Retour à mes élections</a>
+    </div>
+    <div class="detail-skeleton" *ngIf="isLoading">
+      <div class="skeleton" style="width:80px;height:22px;border-radius:99px;margin-bottom:16px;"></div>
+      <div class="skeleton" style="width:50%;height:36px;margin-bottom:12px;"></div>
+      <div class="skeleton" style="width:70%;height:16px;margin-bottom:6px;"></div>
+      <div class="skeleton" style="width:55%;height:16px;margin-bottom:32px;"></div>
+      <div class="skeleton" style="width:100%;height:120px;border-radius:16px;"></div>
+    </div>
+  </div>
+</ng-template>
+
+<!--  Modal suppression  -->
+<div class="modal-overlay" [class.visible]="showDeleteModal" (click)="showDeleteModal = false">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/>
+      </svg>
+    </div>
+    <h3 class="confirm-title">Supprimer l'élection ?</h3>
+    <p class="confirm-text">
+      <strong>« {{ election?.title }} »</strong> sera supprimée définitivement.
+    </p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" (click)="showDeleteModal = false">Annuler</button>
+      <button class="btn btn-danger" (click)="deleteElection()" [disabled]="isDeleting">
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="isDeleting"></span>
+        {{ isDeleting ? 'Suppression…' : 'Supprimer' }}
+      </button>
+    </div>
+  </div>
 </div>

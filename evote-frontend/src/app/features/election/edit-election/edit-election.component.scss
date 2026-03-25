@@ -1,0 +1,177 @@
+// edit-election.component.scss
+// Partage 95% du style de create-election — on surcharge uniquement ce qui diffère
+
+.breadcrumb-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+  font-size: var(--text-sm);
+}
+.breadcrumb-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-gray-500);
+  text-decoration: none;
+  font-weight: var(--font-medium);
+  transition: var(--transition-fast);
+  &:hover { color: var(--color-primary); text-decoration: none; }
+}
+.breadcrumb-sep { color: var(--color-gray-300); }
+.breadcrumb-current { color: var(--color-gray-700); font-weight: var(--font-medium); }
+
+.form-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--space-6);
+  align-items: start;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    .form-sidebar { order: -1; }
+  }
+}
+
+.form-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.form-section {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  animation: fadeUp 0.35s ease both;
+
+  &:nth-child(1) { animation-delay: 0.05s; }
+  &:nth-child(2) { animation-delay: 0.1s; }
+}
+
+.form-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-100);
+}
+
+.section-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: var(--font-body);
+}
+
+.form-field { margin-bottom: var(--space-4); }
+.required { color: var(--color-danger); margin-left: 2px; }
+
+.dates-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+  @media (max-width: 600px) { grid-template-columns: 1fr; }
+}
+
+.option-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.option-index {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: var(--color-primary-light);
+  color: var(--color-primary-dark);
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.option-remove {
+  flex-shrink: 0;
+  color: var(--color-gray-400);
+  &:hover:not(:disabled) { color: var(--color-danger); background-color: var(--color-danger-light); }
+  &:disabled { opacity: 0.3; cursor: not-allowed; }
+}
+
+.add-btn { margin-top: var(--space-2); }
+
+// Sidebar
+.form-sidebar {
+  position: sticky;
+  top: calc(var(--navbar-height) + var(--space-6));
+  animation: fadeUp 0.4s ease 0.2s both;
+}
+
+.summary-card {
+  background-color: var(--color-white);
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-md);
+}
+
+.summary-title {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+  color: var(--color-gray-900);
+  margin-bottom: var(--space-4);
+}
+
+.edit-warning {
+  font-size: var(--text-xs);
+  padding: var(--space-3) var(--space-4);
+  align-items: flex-start;
+  gap: var(--space-2);
+  span { line-height: var(--leading-relaxed); }
+}
+
+.summary-divider {
+  height: 1px;
+  background-color: var(--color-gray-300);
+  margin: var(--space-4) 0;
+}
+
+.btn-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem;
+  font-size: var(--text-base);
+  border-radius: var(--radius-lg);
+}
+
+.btn-cancel {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--space-3);
+  color: var(--color-gray-500);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

@@ -1,66 +1,155 @@
-<div class="container mt-5">
+<div class="page-container">
 
-  <h2>Edit Election</h2>
+  <!--  Breadcrumb ─ -->
+  <nav class="breadcrumb-nav">
+    <a routerLink="/dashboard/my-elections" class="breadcrumb-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Mes élections
+    </a>
+    <span class="breadcrumb-sep">/</span>
+    <span class="breadcrumb-current">Modifier l'élection</span>
+  </nav>
 
-  <form [formGroup]="electionForm" (ngSubmit)="onSubmit()">
-
-    <div class="mb-3">
-      <label>Title</label>
-      <input class="form-control" formControlName="title">
+  <!--  Skeleton  -->
+  <div class="form-layout" *ngIf="isLoadingElection">
+    <div class="form-main">
+      <div class="form-section">
+        <div class="skeleton" style="width:40%;height:24px;margin-bottom:24px;"></div>
+        <div class="skeleton" style="width:100%;height:44px;margin-bottom:16px;border-radius:8px;"></div>
+        <div class="skeleton" style="width:100%;height:88px;margin-bottom:16px;border-radius:8px;"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="skeleton" style="height:44px;border-radius:8px;"></div>
+          <div class="skeleton" style="height:44px;border-radius:8px;"></div>
+        </div>
+      </div>
     </div>
-
-    <div class="mb-3">
-      <label>Description</label>
-      <textarea class="form-control" formControlName="description"></textarea>
+    <div class="form-sidebar">
+      <div class="form-section">
+        <div class="skeleton" style="width:60%;height:20px;margin-bottom:20px;"></div>
+        <div class="skeleton" style="width:100%;height:48px;border-radius:12px;"></div>
+      </div>
     </div>
+  </div>
 
-    <div class="mb-3">
-      <label>Start Date</label>
-      <input type="datetime-local" class="form-control" formControlName="startDate">
-    </div>
+  <!--  Form  -->
+  <form [formGroup]="electionForm" (ngSubmit)="onSubmit()" novalidate
+        *ngIf="!isLoadingElection && electionForm">
+    <div class="form-layout">
 
-    <div class="mb-3">
-      <label>End Date</label>
-      <input type="datetime-local" class="form-control" formControlName="endDate">
-    </div>
+      <!-- Colonne principale -->
+      <div class="form-main">
 
-    <h4>Options</h4>
+        <!-- Informations -->
+        <div class="form-section">
+          <h2 class="form-section-title">
+            <div class="section-num">1</div>
+            Informations générales
+          </h2>
 
-    <div formArrayName="options">
+          <div class="form-field">
+            <label class="form-label" for="title">Titre <span class="required">*</span></label>
+            <input id="title" type="text" class="form-control"
+                   [class.is-invalid]="isInvalid('title')"
+                   formControlName="title">
+            <div class="invalid-feedback" *ngIf="isInvalid('title')">Le titre est requis.</div>
+          </div>
 
-      <div *ngFor="let option of options.controls; let i = index"
-           class="input-group mb-2">
+          <div class="form-field">
+            <label class="form-label" for="description">Description</label>
+            <textarea id="description" class="form-control" rows="3"
+                      formControlName="description"></textarea>
+          </div>
 
-        <input
-          class="form-control"
-          [formControlName]="i">
+          <div class="dates-grid">
+            <div class="form-field">
+              <label class="form-label" for="startDate">Date de début <span class="required">*</span></label>
+              <input id="startDate" type="datetime-local" class="form-control"
+                     [class.is-invalid]="isInvalid('startDate')"
+                     formControlName="startDate">
+            </div>
+            <div class="form-field">
+              <label class="form-label" for="endDate">Date de fin <span class="required">*</span></label>
+              <input id="endDate" type="datetime-local" class="form-control"
+                     [class.is-invalid]="isInvalid('endDate')"
+                     formControlName="endDate">
+            </div>
+          </div>
+        </div>
 
-        <button
-          class="btn btn-danger"
-          type="button"
-          (click)="removeOption(i)">
+        <!-- Options -->
+        <div class="form-section">
+          <h2 class="form-section-title">
+            <div class="section-num">2</div>
+            Options de vote
+          </h2>
 
-          Remove
-        </button>
+          <div formArrayName="options">
+            <div class="option-row" *ngFor="let ctrl of options.controls; let i = index">
+              <div class="option-index">{{ i + 1 }}</div>
+              <input class="form-control"
+                     [class.is-invalid]="ctrl.invalid && ctrl.touched"
+                     [formControlName]="i"
+                     [placeholder]="'Option ' + (i + 1)">
+              <button type="button" class="btn btn-icon btn-ghost option-remove"
+                      (click)="removeOption(i)"
+                      [disabled]="options.length <= 2">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-soft-primary btn-sm add-btn" (click)="addOption()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            Ajouter une option
+          </button>
+        </div>
 
       </div>
 
+      <!-- Sidebar -->
+      <aside class="form-sidebar">
+        <div class="summary-card">
+          <h3 class="summary-title">Enregistrer</h3>
+
+          <div class="alert alert-warning edit-warning">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>Modification possible uniquement avant le début de l'élection.</span>
+          </div>
+
+          <div class="summary-divider"></div>
+
+          <button type="submit" class="btn btn-primary btn-submit" [disabled]="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading"></span>
+            <svg *ngIf="!isLoading" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/>
+              <polyline points="7 3 7 8 15 8"/>
+            </svg>
+            {{ isLoading ? 'Enregistrement…' : 'Enregistrer les modifications' }}
+          </button>
+
+          <button type="button" class="btn btn-ghost btn-cancel"
+                  routerLink="/dashboard/my-elections">
+            Annuler
+          </button>
+        </div>
+      </aside>
+
     </div>
-
-    <button
-      class="btn btn-secondary mt-2"
-      type="button"
-      (click)="addOption()">
-
-      Add Option
-    </button>
-
-    <br><br>
-
-    <button class="btn btn-success">
-      Save Changes
-    </button>
-
   </form>
 
 </div>

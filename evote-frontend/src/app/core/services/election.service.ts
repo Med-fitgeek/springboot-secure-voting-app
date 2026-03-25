@@ -11,7 +11,7 @@ import { VoteRequest } from '../../shared/models/vote-request.model';
 })
 export class ElectionService {
 
-  private readonly API_URL = '/api/elections';
+  private readonly API_URL = 'http://localhost:8080/api/elections';
 
   constructor(private http: HttpClient) {}
 
