@@ -1,14 +1,118 @@
-<div class="container">
-  <h2>Connexion</h2>
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label>Nom d'utilisateur</label>
-      <input class="form-control" formControlName="username" />
+<div class="auth-surface">
+  <div class="auth-card">
+
+    <!-- Logo / Brand -->
+    <div class="auth-brand">
+      <div class="auth-brand-icon">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="8" fill="var(--color-primary)"/>
+          <path d="M8 14.5L12 18.5L20 10" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span class="auth-brand-name">eVote</span>
     </div>
-    <div class="mb-3">
-      <label>Mot de passe</label>
-      <input type="password" class="form-control" formControlName="password" />
+
+    <!-- Header -->
+    <div class="auth-header">
+      <h1 class="auth-title">Bon retour</h1>
+      <p class="auth-subtitle">Connectez-vous à votre espace organisateur</p>
     </div>
-    <button class="btn btn-primary" type="submit">Se connecter</button>
-  </form>
+
+    <!-- Error Alert -->
+    <div class="alert alert-danger auth-alert" *ngIf="errorMessage" role="alert">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      {{ errorMessage }}
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
+
+      <!-- Username -->
+      <div class="form-field">
+        <label class="form-label" for="username">Nom d'utilisateur</label>
+        <div class="input-wrapper">
+          <div class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <input
+            id="username"
+            type="text"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('username')"
+            formControlName="username"
+            placeholder="votre_nom"
+            autocomplete="username"
+          />
+        </div>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('username')">
+          Le nom d'utilisateur est requis.
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-field">
+        <div class="form-label-row">
+          <label class="form-label" for="password">Mot de passe</label>
+          <a href="#" class="forgot-link" tabindex="-1">Mot de passe oublié ?</a>
+        </div>
+        <div class="input-wrapper">
+          <div class="input-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('password')"
+            formControlName="password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+          />
+          <button
+            type="button"
+            class="input-action"
+            (click)="togglePassword()"
+            [attr.aria-label]="showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+          >
+            <svg *ngIf="!showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+            <svg *ngIf="showPassword" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <div class="invalid-feedback" *ngIf="isFieldInvalid('password')">
+          Le mot de passe est requis.
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        class="btn btn-primary btn-submit"
+        [disabled]="isLoading"
+      >
+        <span class="spinner-border spinner-border-sm me-2" *ngIf="isLoading" role="status"></span>
+        <span *ngIf="!isLoading">Se connecter</span>
+        <span *ngIf="isLoading">Connexion…</span>
+      </button>
+
+    </form>
+
+    <!-- Footer -->
+    <div class="auth-footer">
+      <p>Pas encore de compte ?
+        <a routerLink="/register" class="auth-link">Créer un compte</a>
+      </p>
+    </div>
+
+  </div>
 </div>

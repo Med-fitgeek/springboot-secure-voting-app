@@ -46,18 +46,6 @@ export const routes: Routes = [
     ]
   },
   {
-    path: 'dashboard/create-election',
-    canActivate: [authGuard],
-    loadComponent: () =>
-        import('./features/election/create-election/create-election.component').then(m => m.CreateElectionComponent)
-  },
-  {
-    path: 'dashboard/my-elections',
-    canActivate: [authGuard],
-    loadComponent: () =>
-        import('./features/election/my-elections/my-elections.component').then(m => m.MyElectionsComponent)
-  },
-  {
     path: 'dashboard/election/:id',
     canActivate: [authGuard],
     loadComponent: () =>
