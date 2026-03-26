@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping("/api/elections")
 @RequiredArgsConstructor
 @PreAuthorize("hasRole('USER')")
-
 public class ElectionController {
 
     private final ElectionService electionService;

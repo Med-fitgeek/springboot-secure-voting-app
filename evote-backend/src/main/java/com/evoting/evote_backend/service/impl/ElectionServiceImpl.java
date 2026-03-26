@@ -9,7 +9,6 @@ import com.evoting.evote_backend.service.interfaces.ElectionService;
 import com.evoting.evote_backend.service.interfaces.EmailService;
 import com.evoting.evote_backend.service.interfaces.TokenHashService;
 import com.evoting.evote_backend.service.interfaces.VoterTokenService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,11 +42,29 @@ public class ElectionServiceImpl implements ElectionService {
 
         validateElectionDates(dto);
 
-        Election election = electionMapper.toEntity(dto);
-        election.setCreatedBy(creator);
+        Election election = Election.builder()
+                .title(dto.title())
+                .description(dto.description())
+                .createdBy(creator)
+                .startDate(dto.startDate())
+                .endDate(dto.endDate())
+                .build();
 
+        // LIAISON + CONSTRUCTION DES OPTIONS
+        for (OptionDTO optionDto : dto.options()) {
+
+            Option option = Option.builder()
+                    .label(optionDto.label())
+                    .election(election) // relation côté owner
+                    .build();
+
+            election.getOptions().add(option); // synchro côté parent
+        }
+
+        // PERSIST (cascade va sauver les options aussi)
         electionRepository.save(election);
 
+        // TOKENS
         List<VoterTokenResponseDTO> tokensDto = voterTokenService.generateTokens(
                 election,
                 dto.voters()
@@ -79,9 +96,9 @@ public class ElectionServiceImpl implements ElectionService {
         election.setEndDate(dto.endDate());
 
         List<Option> newOptions = new ArrayList<>();
-        for (String label : dto.options()) {
+        for (OptionDTO optionDTO : dto.options()) {
             Option option = Option.builder()
-                    .label(label)
+                    .label(optionDTO.label())
                     .election(election)
                     .build();
             newOptions.add(option);

@@ -19,7 +19,7 @@ public record ElectionRequestDTO(
         String description,
 
         @Size(min = 2, message = "An election must have at least 2 options")
-        List<@NotBlank String> options,
+        List<@Valid OptionDTO> options,
 
         @NotNull(message = "Start date is required")
         LocalDateTime startDate,

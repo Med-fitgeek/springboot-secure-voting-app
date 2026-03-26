@@ -3,6 +3,7 @@ package com.evoting.evote_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.time.LocalDateTime;
 
@@ -33,8 +34,9 @@ public class Election extends BaseEntity {
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
+    @Builder.Default
     @OneToMany(mappedBy = "election", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Option> options;
+    private List<Option> options = new ArrayList<>();
 
     @Column(nullable = false)
     private LocalDateTime startDate;

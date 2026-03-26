@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Entity
 @Table(indexes = {
-        @Index(name = "idx_token_value", columnList = "token"),
+        @Index(name = "idx_token_value", columnList = "tokenHash"),
         @Index(name = "idx_token_election", columnList = "election_id")
 })
 @Getter
