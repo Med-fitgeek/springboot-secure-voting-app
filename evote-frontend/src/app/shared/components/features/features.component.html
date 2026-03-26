@@ -1,0 +1,28 @@
+<section class="features-section" id="features">
+  <div class="section-inner">
+
+    <div class="section-header">
+      <div class="section-eyebrow">Fonctionnalités</div>
+      <h2 class="section-title">Tout ce dont vous avez besoin,<br>rien de superflu</h2>
+      <p class="section-subtitle">
+        eVote a été conçu pour que l'organisation d'une élection prenne
+        des minutes, pas des heures.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card"
+           *ngFor="let f of features; let i = index"
+           [style.animation-delay]="i * 0.08 + 's'">
+        <div class="feature-icon"
+             [style.background]="f.bg"
+             [style.color]="f.color">
+          {{ f.emoji }}
+        </div>
+        <h3 class="feature-title">{{ f.title }}</h3>
+        <p class="feature-desc">{{ f.desc }}</p>
+      </div>
+    </div>
+
+  </div>
+</section>
