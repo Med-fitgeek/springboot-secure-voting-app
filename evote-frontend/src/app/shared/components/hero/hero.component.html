@@ -1,0 +1,109 @@
+<section class="hero-section">
+
+  <!-- Décors de fond -->
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-orb hero-orb--1"></div>
+    <div class="hero-orb hero-orb--2"></div>
+    <div class="hero-grid"></div>
+  </div>
+
+  <div class="hero-inner">
+
+    <!-- ── Contenu gauche ─────────────────────────── -->
+    <div class="hero-content">
+
+      <!-- Badge live -->
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        Plateforme de vote sécurisée
+      </div>
+
+      <!-- Titre -->
+      <h1 class="hero-title">
+        Organisez des élections
+        <span class="hero-title-accent">dignes de confiance</span>
+      </h1>
+
+      <!-- Sous-titre -->
+      <p class="hero-subtitle">
+        eVote simplifie la création et la gestion d'élections en ligne.
+        Tokens uniques, résultats en temps réel, zéro friction pour vos électeurs.
+      </p>
+
+      <!-- CTA -->
+      <div class="hero-actions">
+        <a routerLink="/register" class="btn btn-primary btn-lg btn-pill hero-cta-primary">
+          Créer une élection
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </a>
+        <a href="#how" class="btn btn-ghost btn-lg hero-cta-secondary" (click)="onScrollHow($event)">
+          Voir comment ça marche
+        </a>
+      </div>
+
+      <!-- Social proof -->
+      <div class="hero-proof">
+        <div class="proof-avatars">
+          <div class="proof-avatar" *ngFor="let a of proofAvatars"
+               [style.background]="a.color">{{ a.initial }}</div>
+        </div>
+        <span class="proof-text">Rejoint par +500 organisateurs</span>
+      </div>
+
+    </div>
+
+    <!-- ── Visuel droite — mock card ─────────────── -->
+    <div class="hero-visual" aria-hidden="true">
+
+      <!-- Carte principale -->
+      <div class="mock-card mock-card--main">
+        <div class="mock-card-header">
+          <span class="mock-badge mock-badge--active">● En cours</span>
+          <span class="mock-dates">12 Jan → 20 Jan 2025</span>
+        </div>
+        <h3 class="mock-title">Élection du Conseil d'Administration</h3>
+        <p class="mock-desc">Votez pour élire les membres du nouveau bureau exécutif.</p>
+        <div class="mock-options">
+          <div class="mock-option" *ngFor="let opt of mockOptions">
+            <span class="mock-opt-label">{{ opt.label }}</span>
+            <div class="mock-bar">
+              <div class="mock-bar-fill"
+                   [class.mock-bar-fill--alt]="opt.alt"
+                   [style.width]="opt.pct + '%'"></div>
+            </div>
+            <span class="mock-pct">{{ opt.pct }}%</span>
+          </div>
+        </div>
+        <div class="mock-footer">
+          <span>🗳️ 148 votes exprimés</span>
+          <span>👥 240 électeurs</span>
+        </div>
+      </div>
+
+      <!-- Carte flottante — emails -->
+      <div class="mock-card mock-card--float mock-card--emails">
+        <span class="mock-float-icon">✉️</span>
+        <div>
+          <div class="mock-float-title">Liens envoyés</div>
+          <div class="mock-float-sub">240 électeurs notifiés</div>
+        </div>
+      </div>
+
+      <!-- Carte flottante — sécurité -->
+      <div class="mock-card mock-card--float mock-card--secure">
+        <span class="mock-float-icon">🔐</span>
+        <div>
+          <div class="mock-float-title">Token sécurisé</div>
+          <div class="mock-float-sub">SHA-256 vérifié</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</section>
