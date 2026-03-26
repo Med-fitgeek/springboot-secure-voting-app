@@ -1,48 +1,53 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light px-5">
-  <a class="navbar-brand fw-bold text-primary" routerLink="/">eVote</a>
-  <button
-    class="navbar-toggler"
-    type="button"
-    data-bs-toggle="collapse"
-    data-bs-target="#navbarNav"
-    aria-controls="navbarNav"
-    aria-expanded="false"
-    aria-label="Toggle navigation"
-  >
-    <span class="navbar-toggler-icon"></span>
-  </button>
+<header class="pub-navbar" [class.scrolled]="isScrolled">
+  <div class="pub-navbar-inner">
 
-  <div class="collapse navbar-collapse justify-content-between" id="navbarNav">
-    <ul class="navbar-nav mx-auto">
-      <li class="nav-item h5">
-        <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
-      </li>
-      <li class="nav-item h5">
-        <a class="nav-link" routerLink="/program" routerLinkActive="active">Program</a>
-      </li>
-      <li class="nav-item h5">
-        <a class="nav-link" routerLink="/help" routerLinkActive="active">Help</a>
-      </li>
-      <li class="nav-item h5">
-        <a class="nav-link" routerLink="/contact" routerLinkActive="active">Contact</a>
-      </li>
-    </ul>
+    <!-- Brand -->
+    <a routerLink="/" class="pub-brand">
+      <div class="pub-brand-icon">
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="none">
+          <rect width="28" height="28" rx="7" fill="var(--color-primary)"/>
+          <path d="M8 14.5L12 18.5L20 10" stroke="white" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <span>eVote</span>
+    </a>
 
-    <div class="d-flex">
-      <ng-container *ngIf="!authService.isLoggedIn(); else loggedIn">
-        <a class="btn btn-outline-primary me-2" routerLink="/login">Login</a>
-        <a class="btn btn-primary" routerLink="/register">Register</a>
-      </ng-container>
+    <!-- Nav links -->
+    <nav class="pub-nav-links">
+      <a *ngFor="let link of navLinks"
+         [href]="link.anchor"
+         class="pub-nav-link"
+         (click)="onAnchorClick(link.anchor, $event)">
+        {{ link.label }}
+      </a>
+    </nav>
 
-      <ng-template #loggedIn>
-        <button
-          *ngIf="!isHome()"
-          class="btn btn-outline-danger"
-          (click)="logout()"
-        >
-          Déconnexion
-        </button>
-      </ng-template>
+    <!-- Actions -->
+    <div class="pub-nav-actions">
+      <a routerLink="/login"    class="btn btn-ghost btn-sm">Se connecter</a>
+      <a routerLink="/register" class="btn btn-primary btn-sm btn-pill">Commencer gratuitement</a>
     </div>
+
+    <!-- Burger -->
+    <button class="pub-burger" (click)="mobileOpen = !mobileOpen" aria-label="Ouvrir le menu">
+      <span [class.open]="mobileOpen"></span>
+      <span [class.open]="mobileOpen"></span>
+      <span [class.open]="mobileOpen"></span>
+    </button>
+
   </div>
-</nav>
+
+  <!-- Mobile menu -->
+  <div class="pub-mobile-menu" [class.open]="mobileOpen">
+    <a *ngFor="let link of navLinks"
+       [href]="link.anchor"
+       class="pub-mobile-link"
+       (click)="onAnchorClick(link.anchor, $event); mobileOpen = false">
+      {{ link.label }}
+    </a>
+    <div class="pub-mobile-divider"></div>
+    <a routerLink="/login"    class="pub-mobile-link"  (click)="mobileOpen = false">Se connecter</a>
+    <a routerLink="/register" class="pub-mobile-cta"   (click)="mobileOpen = false">Commencer gratuitement</a>
+  </div>
+</header>
