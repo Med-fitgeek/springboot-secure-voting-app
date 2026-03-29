@@ -72,7 +72,10 @@ export class RegisterComponent {
     this.errorMessage = '';
 
     this.authService.register(this.registerForm.value).subscribe({
-      next: () => this.router.navigate(['/login']),
+      next: (token: string) => {
+        this.authService.saveToken(token);
+        this.router.navigate(['/dashboard']);
+      },
       error: (err) => {
         this.isLoading = false;
         this.errorMessage =
