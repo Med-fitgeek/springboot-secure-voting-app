@@ -31,26 +31,3 @@ jobs:
 
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/evote-frontend:latest
-
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-
-      - name: Deploy backend service
-        run: railway up --service backend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-      - name: Deploy frontend service
-        run: railway up --service frontend
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
