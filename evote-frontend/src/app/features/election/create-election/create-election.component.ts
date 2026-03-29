@@ -55,8 +55,11 @@ export class CreateElectionComponent {
 
   // ── Options ───────────────────────────────────────
   addOption(): void {
-    this.options.push(this.fb.control('', Validators.required));
+    this.voters.push(this.fb.group({
+      label: ['', Validators.required],
+    }));
   }
+
 
   removeOption(i: number): void {
     if (this.options.length > 2) this.options.removeAt(i);
