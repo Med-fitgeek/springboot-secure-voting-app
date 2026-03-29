@@ -6,11 +6,12 @@ import { FeaturesComponent } from "../../shared/components/features/features.com
 import { HowItWorksComponent } from "../../shared/components/how-it-works/how-it-works.component";
 import { SecurityComponent } from "../../shared/components/security/security.component";
 import { CtaComponent } from "../../shared/components/cta/cta.component";
+import { NavbarComponent } from "../../shared/components/navbar/navbar.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, HeroComponent, StatsBandComponent, FeaturesComponent, HowItWorksComponent, SecurityComponent, CtaComponent],
+  imports: [CommonModule, HeroComponent, StatsBandComponent, FeaturesComponent, HowItWorksComponent, SecurityComponent, CtaComponent, NavbarComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
 })
