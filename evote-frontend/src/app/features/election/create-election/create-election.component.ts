@@ -33,8 +33,12 @@ export class CreateElectionComponent {
       startDate: ['', Validators.required],
       endDate: ['', Validators.required],
       options: this.fb.array([
-        this.fb.control('', Validators.required),
-        this.fb.control('', Validators.required),
+        this.fb.group({
+          label: ['', Validators.required],
+        }),
+        this.fb.group({
+          label: ['', Validators.required],
+        }),
       ]),
       voters: this.fb.array([]),
     });
@@ -55,7 +59,7 @@ export class CreateElectionComponent {
 
   // ── Options ───────────────────────────────────────
   addOption(): void {
-    this.voters.push(this.fb.group({
+    this.options.push(this.fb.group({
       label: ['', Validators.required],
     }));
   }

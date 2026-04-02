@@ -79,21 +79,29 @@
           </h2>
 
           <div formArrayName="options">
-            <div class="option-row" *ngFor="let ctrl of options.controls; let i = index">
+            <div class="option-row"
+                *ngFor="let ctrl of options.controls; let i = index"
+                [formGroupName]="i">
+
               <div class="option-index">{{ i + 1 }}</div>
+
               <input class="form-control"
-                     [class.is-invalid]="ctrl.invalid && ctrl.touched"
-                     [formControlName]="i"
-                     [placeholder]="'Option ' + (i + 1)">
-              <button type="button" class="btn btn-icon btn-ghost option-remove"
+                    formControlName="label"
+                    [class.is-invalid]="ctrl.get('label')?.invalid && ctrl.get('label')?.touched"
+                    [placeholder]="'Option ' + (i + 1)">
+
+              <button type="button"
+                      class="btn btn-icon btn-ghost option-remove"
                       (click)="removeOption(i)"
                       [disabled]="options.length <= 2"
                       title="Supprimer">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"/>
+                  <line x1="6" y1="6" x2="18" y2="18"/>
                 </svg>
               </button>
+
             </div>
           </div>
 
