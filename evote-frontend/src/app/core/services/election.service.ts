@@ -5,38 +5,39 @@ import { ElectionRequest } from '../../shared/models/election-request.model';
 import { ElectionResponse } from '../../shared/models/election-response.model';
 import { VoterToken } from '../../shared/models/voter-token.model';
 import { VoteRequest } from '../../shared/models/vote-request.model';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ElectionService {
 
-  private readonly API_URL = 'http://localhost:8080/api/elections';
+  private readonly serviceUrl = `${environment.apiUrl}/elections`
 
   constructor(private http: HttpClient) {}
 
   createElection(request: ElectionRequest): Observable<VoterToken[]> {
-    return this.http.post<VoterToken[]>(`${this.API_URL}`, request);
+    return this.http.post<VoterToken[]>(`${this.serviceUrl}`, request);
   }
 
   getElections(): Observable<ElectionResponse[]> {
-    return this.http.get<ElectionResponse[]>(`${this.API_URL}`);
+    return this.http.get<ElectionResponse[]>(`${this.serviceUrl}`);
   }
 
   getElection(id: number): Observable<ElectionResponse> {
-    return this.http.get<ElectionResponse>(`${this.API_URL}/${id}`);
+    return this.http.get<ElectionResponse>(`${this.serviceUrl}/${id}`);
   }
 
   updateElection(id: number, request: ElectionRequest): Observable<any> {
-    return this.http.put(`${this.API_URL}/${id}`, request);
+    return this.http.put(`${this.serviceUrl}/${id}`, request);
   }
 
   deleteElection(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.API_URL}/${id}`);
+    return this.http.delete<void>(`${this.serviceUrl}/${id}`);
   }
 
   getResults(id: number): Observable<any> {
-    return this.http.get(`${this.API_URL}/${id}/results`);
+    return this.http.get(`${this.serviceUrl}/${id}/results`);
   }
 
   vote(request: VoteRequest): Observable<any> {
