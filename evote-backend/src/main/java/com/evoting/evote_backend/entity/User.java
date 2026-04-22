@@ -40,6 +40,10 @@ public class User  extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private Role role;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
+
     @OneToMany(mappedBy = "createdBy", fetch = FetchType.LAZY)
     private List<Election> elections;
 
