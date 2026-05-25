@@ -12,5 +12,7 @@ public record ElectionResponseDTO(
         String description,
         LocalDateTime startDate,
         LocalDateTime endDate,
-        List<OptionDTO> options
+        List<OptionDTO> options,
+        Long voterCount,
+        Long votesCast
 ) {}

@@ -19,10 +19,10 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody Map<String, String> req) {
+    public ResponseEntity<Map<String,String>> register(@RequestBody Map<String, String> req) {
         String token = authService.register(req.get("username"), req.get("email"), req.get("password"));
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(token);
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("token", token));
     }
 
     @PostMapping("/login")

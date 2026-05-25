@@ -13,4 +13,6 @@ public interface VoterTokenRepository extends JpaRepository<VoterToken, Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<VoterToken> findByTokenHash(String tokenHash);
     long countBySelectedOption(Option option);
+    long countByElectionId(Long electionId);
+    long countByElectionIdAndUsedTrue(Long electionId);
 }

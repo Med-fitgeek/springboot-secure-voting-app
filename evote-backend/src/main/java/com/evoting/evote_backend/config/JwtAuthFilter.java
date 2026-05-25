@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,30 +30,58 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        final String path = request.getServletPath();
+
+        if (path.startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7);
-        username = jwtService.extractUsername(jwt);
+        final String jwt = authHeader.substring(7);
+        String username;
+
+        try {
+            username = jwtService.extractUsername(jwt);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            filterChain.doFilter(request, response);
+            return;
+        } catch (Exception e) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            User user = userRepository.findByUsername(username).orElse(null);
-            if (user != null && jwtService.isTokenValid(jwt, user)) {
+
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new UsernameNotFoundException(username));
+
+            if (jwtService.isTokenValid(jwt, user)) {
+
                 UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(user, null,
-                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())));
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        new UsernamePasswordAuthenticationToken(
+                                user,
+                                null,
+                                List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+                        );
+
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
+
         filterChain.doFilter(request, response);
     }
 }

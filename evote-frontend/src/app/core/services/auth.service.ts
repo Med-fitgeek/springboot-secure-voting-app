@@ -6,20 +6,20 @@ import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API_URL = `${environment.apiUrl}/auth`
+  private readonly serviceUrl = `${environment.apiUrl}/auth`
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
   constructor(private http: HttpClient, private router: Router) {}
 
   login(credentials: { username: string; password: string }): Observable<string> {
-  return this.http.post(`${this.API_URL}/login`, credentials, {
+  return this.http.post(`${this.serviceUrl}/login`, credentials, {
     responseType: 'text'
   });
 }
 
-  register(data: { username: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.API_URL}/register`, data);
+  register(data: { username: string; email: string; password: string }): Observable<{token: string}> {
+    return this.http.post<{token: string}>(`${this.serviceUrl}/register`, data);
   }
 
   logout(): void {

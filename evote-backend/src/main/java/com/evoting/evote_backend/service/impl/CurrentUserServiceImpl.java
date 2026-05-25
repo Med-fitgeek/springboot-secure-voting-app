@@ -35,7 +35,7 @@ public class CurrentUserServiceImpl implements CurrentUserService {
             throw new BusinessException("User not authenticated");
         }
 
-        return userRepository.findByEmailAndDeletedFalse(authentication.getName())
+        return userRepository.findByUsernameAndDeletedFalse(authentication.getName())
                 .orElseThrow(() -> new BusinessException("User not found"));
     }
 

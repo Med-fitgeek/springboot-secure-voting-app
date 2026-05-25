@@ -50,21 +50,16 @@ public class ElectionServiceImpl implements ElectionService {
                 .endDate(dto.endDate())
                 .build();
 
-        // LIAISON + CONSTRUCTION DES OPTIONS
         for (OptionDTO optionDto : dto.options()) {
-
             Option option = Option.builder()
                     .label(optionDto.label())
-                    .election(election) // relation côté owner
+                    .election(election)
                     .build();
-
-            election.getOptions().add(option); // synchro côté parent
+            election.getOptions().add(option);
         }
 
-        // PERSIST (cascade va sauver les options aussi)
         electionRepository.save(election);
 
-        // TOKENS
         List<VoterTokenResponseDTO> tokensDto = voterTokenService.generateTokens(
                 election,
                 dto.voters()
@@ -79,16 +74,16 @@ public class ElectionServiceImpl implements ElectionService {
     @Transactional
     public String updateElection(Long id, ElectionRequestDTO dto, String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Election not found"));
 
         if (!election.getCreatedBy().getId().equals(creator.getId()))
-            throw new BusinessException("Vous n’êtes pas autorisé à modifier cette élection.");
+            throw new BusinessException("User not allowed to update election");
 
         if (election.getStartDate().isBefore(LocalDateTime.now()))
-            throw new BusinessException("Impossible de modifier une élection déjà commencée.");
+            throw new BusinessException("Impossible to update election before start date.");
 
         election.setTitle(dto.title());
         election.setDescription(dto.description());
@@ -118,24 +113,24 @@ public class ElectionServiceImpl implements ElectionService {
         election.setVoterTokens(newVoters);
 
         electionRepository.save(election);
-        return "Élection mise à jour avec succès.";
+        return "Election successfully updated";
     }
 
     @Override
     @Transactional
     public void deleteElection(Long id, String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Election not found"));
 
         if (!election.getCreatedBy().getId().equals(creator.getId())) {
-            throw new BusinessException("Vous n'êtes pas autorisé à supprimer cette élection.");
+            throw new BusinessException("User not allowed to delete election");
         }
 
         if (election.getStartDate().isBefore(LocalDateTime.now())) {
-            throw new BusinessException("Impossible de supprimer une élection déjà commencée.");
+            throw new BusinessException("Impossible to delete election after start date.");
         }
 
         electionRepository.delete(election);
@@ -144,10 +139,10 @@ public class ElectionServiceImpl implements ElectionService {
     @Override
     public ElectionResponseDTO getElectionById(Long id, String username) {
         Election election = electionRepository.findById(id)
-                .orElseThrow(() -> new BusinessException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Election not found"));
 
         if (!election.getCreatedBy().getUsername().equals(username)) {
-            throw new BusinessException("Accès interdit à cette élection.");
+            throw new BusinessException("Acces not allowed to retrieve election");
         }
 
         return electionMapper.toDto(election);
@@ -156,20 +151,38 @@ public class ElectionServiceImpl implements ElectionService {
     @Override
     public List<ElectionResponseDTO> getElectionsByCreator(String username) {
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         List<Election> elections = electionRepository.findByCreatedBy(creator);
-        return electionMapper.toDtoList(elections);
+        return elections.stream().map(election -> {
+
+            long voterCount = voterTokenRepository.countByElectionId(election.getId());
+            long votesCast = voterTokenRepository.countByElectionIdAndUsedTrue(election.getId());
+
+            ElectionResponseDTO dto = electionMapper.toDto(election);
+
+            return ElectionResponseDTO.builder()
+                    .id(dto.id())
+                    .title(dto.title())
+                    .description(dto.description())
+                    .startDate(dto.startDate())
+                    .endDate(dto.endDate())
+                    .options(dto.options())
+                    .voterCount(voterCount)
+                    .votesCast(votesCast)
+                    .build();
+
+        }).toList();
     }
 
     @Override
     public List<ElectionResultDTO> getElectionResults(Long electionId, String username) {
 
         userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("User not found"));
 
         Election election = electionRepository.findById(electionId)
-                .orElseThrow(() -> new BusinessException("Élection introuvable"));
+                .orElseThrow(() -> new BusinessException("Election not found"));
 
         List<Option> options = optionRepository.findByElection(election);
 

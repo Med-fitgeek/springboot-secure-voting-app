@@ -48,19 +48,14 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        // Frontend Angular
         config.setAllowedOrigins(List.of("http://localhost:4200", "https://votely.tech"));
 
-        // Méthodes autorisées
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // Headers autorisés
         config.setAllowedHeaders(List.of("*"));
 
-        // Si tu utilises cookies / Authorization header
         config.setAllowCredentials(true);
 
-        // Headers exposés (si besoin)
         config.setExposedHeaders(List.of("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

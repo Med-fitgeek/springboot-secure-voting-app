@@ -26,7 +26,7 @@ public class CsvImportServiceImpl implements CsvImportService {
     public List<VoterDTO> parseVotersCsv(MultipartFile file, String username) {
 
         User creator = userRepository.findByUsername(username)
-                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+                .orElseThrow(() -> new BusinessException("User not found"));
         List<VoterDTO> voters = new ArrayList<>();
 
         try (Reader reader = new InputStreamReader(file.getInputStream())) {

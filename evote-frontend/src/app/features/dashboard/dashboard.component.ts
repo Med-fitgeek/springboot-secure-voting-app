@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ElectionService } from '../../core/services/election.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -24,11 +25,16 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private electionService: ElectionService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
-    this.username = /*this.authService.getUsername() ?? */'Organisateur';
+    
+    this.userService.getCurrentUser().subscribe(user => {
+      this.username = user.username;
+    });
+
     this.loadStats();
   }
 

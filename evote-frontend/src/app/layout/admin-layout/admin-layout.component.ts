@@ -2,6 +2,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-admin-layout',
@@ -18,13 +19,17 @@ export class AdminLayoutComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private userService: UserService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    const name = /*this.authService.getUsername() ?? */'Utilisateur';
-    this.username = name;
-    this.userInitial = name.charAt(0).toUpperCase();
+    
+    this.userService.getCurrentUser().subscribe(user => {
+      this.username = user.username;
+    });
+
+    this.userInitial = this.username.charAt(0).toUpperCase();
   }
 
   toggleUserMenu(): void {

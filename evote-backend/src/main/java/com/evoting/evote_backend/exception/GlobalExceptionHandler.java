@@ -14,7 +14,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleGeneric(Exception e) {
         return ResponseEntity.status(500)
-                .body("Une erreur interne est survenue");
+                .body("An internal error occurred : " + e.getMessage());
     }
 
 
